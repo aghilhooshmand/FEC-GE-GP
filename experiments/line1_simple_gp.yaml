@@ -1,0 +1,8 @@
+# GP on house_16H, california, Run_or_walk_information, codrna.
+name: line1_simple_gp
+algorithm: GP
+datasets: [house_16H, california, Run_or_walk_information, codrna]
+seeds: 30-59
+fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
+params: {}
+hive: {workers: 39, max_busy: 0.10}

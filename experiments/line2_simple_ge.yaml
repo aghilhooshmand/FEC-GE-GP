@@ -1,0 +1,8 @@
+# GE on dry_bean.
+name: line2_simple_ge
+algorithm: GE
+datasets: [dry_bean]
+seeds: 30-59
+fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
+params: {}
+hive: {workers: 25, max_busy: 0.10}

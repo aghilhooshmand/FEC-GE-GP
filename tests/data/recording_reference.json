@@ -1,0 +1,398 @@
+[
+ {
+  "algorithm": "GE",
+  "dataset": "appendicitis",
+  "fec": null,
+  "best_phenotype": "greater_than_or_equal(add(-1.89,sub(x[3],x[4])),mul(add(x[5],x[2]),mul(x[1],x[4])))",
+  "best_test_error": 0.18181818181818177,
+  "n_train_evals": 117,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.1428571428571429,
+    "avg": 0.48015873015873006,
+    "std": 0.192015932718453,
+    "max": 0.8809523809523809,
+    "fitness_test": null,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 5.533333333333333
+   },
+   {
+    "gen": 1,
+    "invalid": 18,
+    "min": 0.1428571428571429,
+    "avg": 0.34821428571428575,
+    "std": 0.14019721087278422,
+    "max": 0.6428571428571428,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 6.833333333333333
+   },
+   {
+    "gen": 2,
+    "invalid": 22,
+    "min": 0.13095238095238093,
+    "avg": 0.2976190476190476,
+    "std": 0.15187322407348897,
+    "max": 0.6428571428571428,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 6.875
+   },
+   {
+    "gen": 3,
+    "invalid": 15,
+    "min": 0.13095238095238093,
+    "avg": 0.2555555555555556,
+    "std": 0.17019322678040077,
+    "max": 0.8571428571428572,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 8.533333333333333
+   }
+  ]
+ },
+ {
+  "algorithm": "GE",
+  "dataset": "appendicitis",
+  "fec": {
+   "fraction": 0.1,
+   "sampler": "random",
+   "diagnostic": true
+  },
+  "best_phenotype": "greater_than_or_equal(add(-1.89,sub(x[5],x[4])),mul(add(x[5],x[6]),mul(x[1],x[0])))",
+  "best_test_error": 0.2272727272727273,
+  "n_train_evals": 110,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.1428571428571429,
+    "avg": 0.4789682539682539,
+    "std": 0.1991735412179288,
+    "max": 0.8809523809523809,
+    "fitness_test": null,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 5.533333333333333,
+    "fec_hits": 6,
+    "fec_misses": 24,
+    "fec_same_phenotype_hits": 0,
+    "fec_fake_hits": 4,
+    "fec_cache_size": 24
+   },
+   {
+    "gen": 1,
+    "invalid": 18,
+    "min": 0.13095238095238093,
+    "avg": 0.33928571428571436,
+    "std": 0.15372823297791618,
+    "max": 0.6071428571428572,
+    "fitness_test": 0.2272727272727273,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 6.833333333333333,
+    "fec_hits": 5,
+    "fec_misses": 6,
+    "fec_same_phenotype_hits": 1,
+    "fec_fake_hits": 4,
+    "fec_cache_size": 30
+   },
+   {
+    "gen": 2,
+    "invalid": 15,
+    "min": 0.13095238095238093,
+    "avg": 0.24841269841269842,
+    "std": 0.13305431879901833,
+    "max": 0.5952380952380952,
+    "fitness_test": 0.2272727272727273,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 8.6,
+    "fec_hits": 9,
+    "fec_misses": 1,
+    "fec_same_phenotype_hits": 2,
+    "fec_fake_hits": 7,
+    "fec_cache_size": 31
+   },
+   {
+    "gen": 3,
+    "invalid": 22,
+    "min": 0.13095238095238093,
+    "avg": 0.16666666666666666,
+    "std": 0.04374088826398535,
+    "max": 0.23809523809523814,
+    "fitness_test": 0.2272727272727273,
+    "best_nodes": 9,
+    "best_depth": 7,
+    "avg_nodes": 9.75,
+    "fec_hits": 3,
+    "fec_misses": 1,
+    "fec_same_phenotype_hits": 0,
+    "fec_fake_hits": 3,
+    "fec_cache_size": 32
+   }
+  ]
+ },
+ {
+  "algorithm": "GE",
+  "dataset": "iris",
+  "fec": null,
+  "best_phenotype": "argmax3(where(greater_than_or_equal(x[1],x[2]),8.9,1.2),where(greater_than_or_equal(x[3],x[0]),0.6,8.8),where(greater_than_or_equal(x[1],x[3]),0.5,1.4))",
+  "best_test_error": 0.2666666666666667,
+  "n_train_evals": 117,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.3416666666666667,
+    "avg": 0.6483333333333333,
+    "std": 0.15312183481233596,
+    "max": 0.9416666666666667,
+    "fitness_test": null,
+    "best_nodes": 18,
+    "best_depth": 7,
+    "avg_nodes": 18.0
+   },
+   {
+    "gen": 1,
+    "invalid": 25,
+    "min": 0.3416666666666667,
+    "avg": 0.6200000000000001,
+    "std": 0.17705931209625775,
+    "max": 0.8166666666666667,
+    "fitness_test": 0.3666666666666667,
+    "best_nodes": 18,
+    "best_depth": 7,
+    "avg_nodes": 18.0
+   },
+   {
+    "gen": 2,
+    "invalid": 21,
+    "min": 0.3416666666666667,
+    "avg": 0.49537037037037046,
+    "std": 0.15718939150304448,
+    "max": 0.7583333333333333,
+    "fitness_test": 0.3666666666666667,
+    "best_nodes": 18,
+    "best_depth": 7,
+    "avg_nodes": 18.22222222222222
+   },
+   {
+    "gen": 3,
+    "invalid": 16,
+    "min": 0.30000000000000004,
+    "avg": 0.41250000000000003,
+    "std": 0.1691701852789125,
+    "max": 0.925,
+    "fitness_test": 0.2666666666666667,
+    "best_nodes": 18,
+    "best_depth": 7,
+    "avg_nodes": 18.142857142857142
+   }
+  ]
+ },
+ {
+  "algorithm": "GP",
+  "dataset": "appendicitis",
+  "fec": null,
+  "best_phenotype": "and_(less_than_or_equal(sub(x6, 0.24), sub(x5, pdiv(pdiv(x0, -1.14), add(x6, x6)))), and_(and_(less_than_or_equal(pdiv(x4, x4), mul(-0.73, x1)), less_than_or_equal(x6, -0.35)), and_(not_(and_(greater_than_or_equal(x3, x2), greater_than_or_equal(x1, x2))), less_than_or_equal(x6, -0.35))))",
+  "best_test_error": 0.18181818181818177,
+  "n_train_evals": 98,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.20238095238095233,
+    "avg": 0.4876984126984127,
+    "std": 0.18354150553201976,
+    "max": 0.7976190476190477,
+    "fitness_test": null,
+    "best_nodes": 261,
+    "best_depth": 8,
+    "avg_nodes": 68.6
+   },
+   {
+    "gen": 1,
+    "invalid": 0,
+    "min": 0.15476190476190477,
+    "avg": 0.29801587301587307,
+    "std": 0.11437179848739648,
+    "max": 0.6071428571428572,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 31,
+    "best_depth": 6,
+    "avg_nodes": 115.63333333333334
+   },
+   {
+    "gen": 2,
+    "invalid": 0,
+    "min": 0.15476190476190477,
+    "avg": 0.2115079365079365,
+    "std": 0.04524679671257186,
+    "max": 0.36904761904761907,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 31,
+    "best_depth": 6,
+    "avg_nodes": 138.03333333333333
+   },
+   {
+    "gen": 3,
+    "invalid": 0,
+    "min": 0.1428571428571429,
+    "avg": 0.19801587301587306,
+    "std": 0.03317469810877279,
+    "max": 0.3214285714285714,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 38,
+    "best_depth": 6,
+    "avg_nodes": 80.76666666666667
+   }
+  ]
+ },
+ {
+  "algorithm": "GP",
+  "dataset": "appendicitis",
+  "fec": {
+   "fraction": 0.1,
+   "sampler": "random",
+   "diagnostic": true
+  },
+  "best_phenotype": "and_(less_than_or_equal(sub(x6, x5), sub(mul(x4, x2), pdiv(pdiv(x1, -1.14), add(x6, x6)))), and_(not_(greater_than_or_equal(x1, x2)), and_(not_(and_(greater_than_or_equal(x3, x2), greater_than_or_equal(x1, x2))), less_than_or_equal(x6, -0.35))))",
+  "best_test_error": 0.18181818181818177,
+  "n_train_evals": 101,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.20238095238095233,
+    "avg": 0.48055555555555557,
+    "std": 0.18711022306574213,
+    "max": 0.7976190476190477,
+    "fitness_test": null,
+    "best_nodes": 261,
+    "best_depth": 8,
+    "avg_nodes": 68.6,
+    "fec_hits": 8,
+    "fec_misses": 22,
+    "fec_same_phenotype_hits": 0,
+    "fec_fake_hits": 7,
+    "fec_cache_size": 22
+   },
+   {
+    "gen": 1,
+    "invalid": 0,
+    "min": 0.20238095238095233,
+    "avg": 0.305952380952381,
+    "std": 0.10388112791896953,
+    "max": 0.5952380952380952,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 261,
+    "best_depth": 8,
+    "avg_nodes": 106.66666666666667,
+    "fec_hits": 12,
+    "fec_misses": 6,
+    "fec_same_phenotype_hits": 0,
+    "fec_fake_hits": 7,
+    "fec_cache_size": 28
+   },
+   {
+    "gen": 2,
+    "invalid": 0,
+    "min": 0.20238095238095233,
+    "avg": 0.2261904761904762,
+    "std": 0.057505463278529526,
+    "max": 0.4285714285714286,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 261,
+    "best_depth": 8,
+    "avg_nodes": 140.4,
+    "fec_hits": 27,
+    "fec_misses": 2,
+    "fec_same_phenotype_hits": 1,
+    "fec_fake_hits": 10,
+    "fec_cache_size": 30
+   },
+   {
+    "gen": 3,
+    "invalid": 0,
+    "min": 0.16666666666666663,
+    "avg": 0.2285714285714286,
+    "std": 0.08363889557262046,
+    "max": 0.5952380952380952,
+    "fitness_test": 0.18181818181818177,
+    "best_nodes": 33,
+    "best_depth": 6,
+    "avg_nodes": 168.26666666666668,
+    "fec_hits": 22,
+    "fec_misses": 2,
+    "fec_same_phenotype_hits": 0,
+    "fec_fake_hits": 12,
+    "fec_cache_size": 32
+   }
+  ]
+ },
+ {
+  "algorithm": "GP",
+  "dataset": "iris",
+  "fec": null,
+  "best_phenotype": "argmax3(where(less_than_or_equal(add(1.94, x0), pdiv(x2, x0)), where(less_than_or_equal(x2, 0.0), where(greater_than_or_equal(0.06, x2), 8.7, 7.5), where(greater_than_or_equal(x3, x3), 7.8, 5.3)), where(not_(less_than_or_equal(x0, x0)), where(less_than_or_equal(x1, x2), 1.4, 1.2), where(greater_than_or_equal(1.59, x1), 8.0, 3.7))), where(not_(greater_than_or_equal(x0, -1.42)), where(not_(greater_than_or_equal(x1, -0.59)), where(greater_than_or_equal(x3, 1.82), 2.0, 4.4), where(less_than_or_equal(x3, x2), 0.0, 1.2)), where(and_(less_than_or_equal(x1, x0), greater_than_or_equal(x1, x0)), where(greater_than_or_equal(x2, x0), 5.7, 1.1), where(less_than_or_equal(x0, x1), 8.6, 9.5))), where(or_(less_than_or_equal(-1.56, x2), and_(greater_than_or_equal(x2, 1.14), less_than_or_equal(x0, x1))), where(not_(less_than_or_equal(x3, x2)), where(greater_than_or_equal(x1, -0.87), 1.4, 6.7), where(greater_than_or_equal(x1, x2), 0.7, 1.9)), where(or_(greater_than_or_equal(x2, x0), greater_than_or_equal(x2, x0)), where(greater_than_or_equal(x1, x2), 7.2, 0.2), where(less_than_or_equal(x2, x2), 8.9, 3.6))))",
+  "best_test_error": 0.3666666666666667,
+  "n_train_evals": 99,
+  "generations": [
+   {
+    "gen": 0,
+    "invalid": 0,
+    "min": 0.3416666666666667,
+    "avg": 0.6547222222222223,
+    "std": 0.16126931887335716,
+    "max": 0.9333333333333333,
+    "fitness_test": null,
+    "best_nodes": 91,
+    "best_depth": 5,
+    "avg_nodes": 434.1
+   },
+   {
+    "gen": 1,
+    "invalid": 0,
+    "min": 0.3416666666666667,
+    "avg": 0.5102777777777777,
+    "std": 0.08326895661531054,
+    "max": 0.725,
+    "fitness_test": 0.4,
+    "best_nodes": 91,
+    "best_depth": 5,
+    "avg_nodes": 412.6666666666667
+   },
+   {
+    "gen": 2,
+    "invalid": 0,
+    "min": 0.3416666666666667,
+    "avg": 0.455,
+    "std": 0.10498236183424481,
+    "max": 0.6666666666666667,
+    "fitness_test": 0.4,
+    "best_nodes": 91,
+    "best_depth": 5,
+    "avg_nodes": 202.16666666666666
+   },
+   {
+    "gen": 3,
+    "invalid": 0,
+    "min": 0.33333333333333337,
+    "avg": 0.4066666666666666,
+    "std": 0.13190905958272922,
+    "max": 0.9166666666666666,
+    "fitness_test": 0.3666666666666667,
+    "best_nodes": 133,
+    "best_depth": 5,
+    "avg_nodes": 111.23333333333333
+   }
+  ]
+ }
+]

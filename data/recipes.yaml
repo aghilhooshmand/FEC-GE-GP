@@ -1,0 +1,209 @@
+# Dataset recipes: one entry per dataset; `python datasets.py recreate <name>` rebuilds its table from
+# the source and checks it against data/corpus.json (sha256).
+wine_quality:
+  source: openml
+  id: 44091
+  url: https://www.openml.org/d/44091
+  source_label: quality
+  source_checksum: 186e8091b46ded1fb558e4a59751c6c0293ecbab5eda4cc7666f85859adf7a3e
+  retrieved: 2026-10-02
+  notes: 'Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44091); original UCI Wine Quality, regression
+    target binarised by the benchmark. Named wine_quality: `wine` in DataComplexity is the classic 3-class UCI Wine (178 rows).'
+phoneme_balanced:
+  source: openml
+  id: 44127
+  url: https://www.openml.org/d/44127
+  source_label: Class
+  source_checksum: 4e4038de03f45a13a02da67bffa0be636b8037fa67b6d6920521decc4dfaec03
+  retrieved: 2026-10-02
+  notes: 'Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44127); original OpenML 1489. Named phoneme_balanced:
+    PMLB''s `phoneme` (5,404 rows) is a different table; the benchmark balanced it to 3,172.'
+dry_bean:
+  source: uci
+  id: 602
+  url: https://archive.ics.uci.edu/dataset/602/dry+bean+dataset
+  source_label: Class
+  source_checksum: a1aedad37f39f792a19572c5049d24dbee1b16360813c86ffdeb6312d5cfc98e
+  retrieved: 2026-10-05
+  balance:
+    method: undersample
+    seed: 0
+  notes: 'UCI 602, Koklu & Ozkan 2020; 7 classes. Reference: SVM accuracy 0.931 (original paper).'
+bank_marketing:
+  source: openml
+  id: 44126
+  url: https://www.openml.org/d/44126
+  source_label: Class
+  source_checksum: ee05362ebc1a9cf74a7464a9108c5a14229ee0c5cef1871707202a5d1a0794de
+  retrieved: 2026-10-02
+  drop:
+  - column: V12
+    reason: call duration, known only after the call; leaks the label
+  notes: Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44126); original OpenML 1461, UCI 222 (Bank Marketing).
+MagicTelescope:
+  source: openml
+  id: 44125
+  url: https://www.openml.org/d/44125
+  source_label: class
+  source_checksum: 05ef682aa659aa803a1989916d57b473a32519757c63735022b3a950c9453ea2
+  retrieved: 2026-10-02
+  label_map:
+    g: 0
+    h: 1
+  rename:
+    'fLength:': fLength
+    'fWidth:': fWidth
+    'fSize:': fSize
+    'fConc:': fConc
+    'fConc1:': fConc1
+    'fAsym:': fAsym
+    'fM3Long:': fM3Long
+    'fM3Trans:': fM3Trans
+    'fAlpha:': fAlpha
+    'fDist:': fDist
+  notes: Grinsztajn et al. 2022 benchmark (OpenML 44125); original OpenML 1120, UCI MAGIC Gamma Telescope (Bock et al. 2004).
+house_16H:
+  source: openml
+  id: 44123
+  url: https://www.openml.org/d/44123
+  source_label: binaryClass
+  source_checksum: aaf0e93ac6c5ea8a276fa49ccdbfdc2e7c02cdd907b9f8ec6c716eae472ce8bc
+  retrieved: 2026-10-02
+  notes: Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44123); original OpenML 821.
+credit:
+  source: openml
+  id: 44089
+  url: https://www.openml.org/d/44089
+  source_label: SeriousDlqin2yrs
+  source_checksum: 626a5ba91fa47922f7b2e31409cfeb3fa5d4a48d6bbfff1f451e81efbe70b418
+  retrieved: 2026-10-02
+  notes: Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44089); original Kaggle 'Give Me Some Credit' (cs-training.csv).
+california:
+  source: openml
+  id: 44090
+  url: https://www.openml.org/d/44090
+  source_label: price
+  source_checksum: e40604d8ed292c0808a0d5a9aefc50f285d931e5eecdeb9e63941501a28e4730
+  retrieved: 2026-10-02
+  notes: Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44090); original cal_housing (Torgo), regression
+    target binarised by the benchmark.
+electricity:
+  source: openml
+  id: 44120
+  url: https://www.openml.org/d/44120
+  source_label: class
+  source_checksum: aafcf697748721a9c4afe2720c8033f325d077a247f1ab509fb58523d4558292
+  retrieved: 2026-10-02
+  label_map:
+    DOWN: 0
+    UP: 1
+  notes: Grinsztajn et al. 2022 benchmark (OpenML 44120); original OpenML 151, Harries 1999 elec2. `date` kept, as in the
+    benchmark.
+electricity_cat:
+  source: openml
+  id: 44156
+  url: https://www.openml.org/d/44156
+  source_label: class
+  source_checksum: e96140c780e7d8df8e3e7873983c9f4c113c10cfe9d39fb8f38dd8683f146c18
+  retrieved: 2026-10-02
+  one_hot:
+  - day
+  notes: Grinsztajn et al. 2022 categorical classification benchmark (OpenML 44156); original OpenML 151 (Harries 1999 elec2);
+    the numerical suite's version is `electricity` (44120).
+sleep:
+  source: pmlb
+  id: sleep
+  url: https://epistasislab.github.io/pmlb/profile/sleep.html
+  source_label: target
+  source_checksum: c11cf86c43c5f398db5b47bcdf51fef36dfdd5f5911067a53276d034756d9582
+  retrieved: 2026-10-07
+  types:
+  - column: V3
+    type: numeric
+    reason: 0-10 levels like V0-V12; PMLB's profile page and OpenML treat all 13 as numeric, only metadata.yaml tags V3 categorical
+  balance:
+    method: undersample
+    seed: 0
+  notes: PMLB sleep; 5 classes; no source, description or publication in PMLB's metadata. All 13 features numeric (V3 overridden).
+    No published reference accuracy found (not on UCI or OpenML).
+Diabetes130US:
+  source: openml
+  id: 45022
+  url: https://www.openml.org/d/45022
+  source_label: readmitted
+  source_checksum: ad7fa379c4e96f5dc52a0fec37b6c6f314f1bbb47ce361cf6ecba75ad58472c1
+  retrieved: 2026-10-02
+  notes: 'Grinsztajn et al. 2022 benchmark (OpenML 45022; original OpenML 4541, UCI 296, Strack et al. 2014). Not the UCI
+    <30-day task: >30-day readmission vs none, 7 numeric utilisation counts, classes balanced at 35,545 (the <30 class dropped,
+    NO undersampled; worked out from the counts).'
+Run_or_walk_information:
+  source: openml
+  id: 40922
+  url: https://www.openml.org/d/40922
+  source_label: activity
+  source_checksum: 3d9603dce5d00fab3651ac231c7265f9700b2855a0257fe16da8ec61185a8e22
+  retrieved: 2026-10-02
+  notes: OpenML 40922, originally Kaggle.
+accelerometer:
+  source: zip
+  id: accelerometer (1).csv
+  download: https://archive.ics.uci.edu/static/public/846/accelerometer.zip
+  url: https://archive.ics.uci.edu/dataset/846/accelerometer
+  source_label: wconfid
+  source_checksum: 00557d031124defb8cebc6ae62cb1833e4cadde546c6c2b1997a8925d92816b0
+  retrieved: 2026-10-07
+  notes: UCI 846; 3 configurations, 51,000 rows each (already balanced). No published reference accuracy for this task.
+codrna:
+  source: openml
+  id: 351
+  url: https://www.openml.org/d/351
+  source_label: Y
+  source_checksum: 94da8e60d3a565ff2d6bece1c8add1278dbc397cd46ef0c0d2940792938156ed
+  retrieved: 2026-10-02
+  notes: LIBSVM cod-rna benchmark (OpenML 351). About 30% duplicate rows, kept as published; they raise FEC's cache hit rate.
+covertype:
+  source: openml
+  id: 44121
+  url: https://www.openml.org/d/44121
+  source_label: Y
+  source_checksum: abccb545f9132e695c9760c797d916cadf0f287d918a2f7481d6997c2cd4685d
+  retrieved: 2026-10-02
+  notes: 'Grinsztajn et al. 2022 benchmark binary version (OpenML 44121): the two largest classes, balanced; original OpenML
+    293, UCI Covertype.'
+lhc_jets:
+  source: openml
+  id: 42468
+  url: https://www.openml.org/d/42468
+  source_label: class
+  source_checksum: 3986e82a77e264398e6537f6c7dd7c8d54b7f3b46e3f0324dcb769d5ee3e2084
+  retrieved: 2026-10-07
+  drop:
+  - column: d2_a1_b1_mmdt
+    reason: identical to d2_b1_mmdt in every row
+  balance:
+    method: undersample
+    seed: 0
+  notes: 'hls4ml LHC jet tagging, 16 high-level features; 5 classes. Reference: about 0.75 accuracy in the hls4ml papers (to
+    be confirmed from the paper).'
+appendicitis:
+  source: pmlb
+  id: appendicitis
+  url: https://epistasislab.github.io/pmlb/profile/appendicitis.html
+  source_label: target
+  source_checksum: f9c29759b57b715c8a6e9d5b017803d9edaf1f95ec296c526fd8d1ffcb35a86d
+  retrieved: 2026-10-02
+prnn_crabs:
+  source: pmlb
+  id: prnn_crabs
+  url: https://epistasislab.github.io/pmlb/profile/prnn_crabs.html
+  source_label: target
+  source_checksum: 3dc6fe9a713759d4cbfa47e39617fe2ff462e3be09f0b2affa4adb926febffa4
+  retrieved: 2026-10-02
+iris:
+  source: pmlb
+  id: iris
+  url: https://epistasislab.github.io/pmlb/profile/iris.html
+  source_label: target
+  source_checksum: d6e57e564c701907d1063d01c8ade500ee1e6e1ffc6a70e553417985b7cb8835
+  retrieved: 2026-10-02
+  notes: PMLB iris (Fisher 1936); 3 classes, 4 numeric features. Multiclass test dataset.

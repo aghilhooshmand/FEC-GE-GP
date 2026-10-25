@@ -1,0 +1,12 @@
+# Per-phase timing of FEC (random rows), FEC timing runs only, checked against the stored default runs.
+name: phase_timing_ge
+algorithm: GE
+datasets: [wine_quality, phoneme_balanced, bank_marketing, MagicTelescope, house_16H, credit, california, electricity,
+           electricity_cat, Diabetes130US, Run_or_walk_information, codrna, covertype, dry_bean, sleep, accelerometer,
+           lhc_jets]
+seeds: 30-59
+fec: {samplers: [random], fractions: [0.01, 0.05, 0.10]}
+modes: [fec]
+phase_timing: true
+params: {}
+hive: {workers: 25, max_busy: 0.10}

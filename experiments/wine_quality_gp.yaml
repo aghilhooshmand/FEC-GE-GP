@@ -1,0 +1,8 @@
+# GP on wine_quality.
+name: wine_quality_gp
+algorithm: GP
+datasets: [wine_quality]
+seeds: 30-59
+fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
+params: {}
+hive: {workers: 36, max_busy: 0.10}

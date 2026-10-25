@@ -1,0 +1,8 @@
+# Pipeline check on the test datasets (two seeds).
+name: pilot_small
+algorithm: GE
+datasets: [appendicitis, prnn_crabs]
+seeds: 30-31
+fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
+params: {}
+hive: {workers: 39, max_busy: 0.10}

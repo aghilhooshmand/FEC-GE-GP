@@ -1,0 +1,8 @@
+# GP on bank_marketing, credit, Diabetes130US.
+name: line1_hard_gp
+algorithm: GP
+datasets: [bank_marketing, credit, Diabetes130US]
+seeds: 30-59
+fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
+params: {}
+hive: {workers: 39, max_busy: 0.10}

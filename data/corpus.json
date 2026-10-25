@@ -1,0 +1,2994 @@
+{
+  "corpus_version": "7e9c14889382",
+  "datasets": {
+    "Diabetes130US": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "cast",
+          "detail": "uint8 → int64",
+          "effect": "7 columns"
+        }
+      ],
+      "checksum": "8185129b133d4ac15fc38cfb5ffbb6afa24cbadeea3016fd32e6411aef72b674",
+      "class_counts": {
+        "0": 35545,
+        "1": 35545
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.6028153421266671,
+            0.6083927123084772,
+            0.6097231600270088
+          ],
+          "mean": 0.6069770714873844
+        },
+        "logreg": {
+          "folds": [
+            0.5992678222688388,
+            0.6051458115566182,
+            0.6009875084402431
+          ],
+          "mean": 0.6018003807552333
+        },
+        "settings": {
+          "code_commit": "a93eec6961504505613e2769212bb5f14eebfa98-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.587662174615772,
+            0.595018787785919,
+            0.5935600945307224
+          ],
+          "mean": 0.5920803523108045
+        }
+      },
+      "duplicate_rows": 7720,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "time_in_hospital",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "num_lab_procedures",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "num_medications",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "number_outpatient",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "number_emergency",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "number_inpatient",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "number_diagnoses",
+          "type": "numeric"
+        }
+      ],
+      "id": 45022,
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 7,
+      "n_numeric": 7,
+      "n_rows": 71090,
+      "name": "Diabetes130US",
+      "notes": "Grinsztajn et al. 2022 benchmark (OpenML 45022; original OpenML 4541, UCI 296, Strack et al. 2014). Not the UCI <30-day task: >30-day readmission vs none, 7 numeric utilisation counts, classes balanced at 35,545 (the <30 class dropped, NO undersampled; worked out from the counts).",
+      "original_shape": [
+        71090,
+        8
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "ad7fa379c4e96f5dc52a0fec37b6c6f314f1bbb47ce361cf6ecba75ad58472c1",
+      "url": "https://www.openml.org/d/45022"
+    },
+    "MagicTelescope": {
+      "changes": [
+        {
+          "action": "rename_columns",
+          "detail": "{\"fLength:\": \"fLength\", \"fWidth:\": \"fWidth\", \"fSize:\": \"fSize\", \"fConc:\": \"fConc\", \"fConc1:\": \"fConc1\", \"fAsym:\": \"fAsym\", \"fM3Long:\": \"fM3Long\", \"fM3Trans:\": \"fM3Trans\", \"fAlpha:\": \"fAlpha\", \"fDist:\": \"fDist\"}",
+          "effect": "10 columns"
+        },
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"g\": 0, \"h\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "133896f8ef7fc3a582ca8d6325108e40ebccd8415ee84595814a1509e53f0134",
+      "class_counts": {
+        "0": 6688,
+        "1": 6688
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.8591527902677104,
+            0.8560279600134388,
+            0.8580080753701211
+          ],
+          "mean": 0.8577296085504235
+        },
+        "logreg": {
+          "folds": [
+            0.7743764925050345,
+            0.7752965897957418,
+            0.762673844773441
+          ],
+          "mean": 0.7707823090247391
+        },
+        "settings": {
+          "code_commit": "9a4b795ab055355f0a8dd6160dcb0cbacb6d84a0",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.744797984979892,
+            0.7344423387591612,
+            0.7379991027366533
+          ],
+          "mean": 0.7390798088252355
+        }
+      },
+      "duplicate_rows": 115,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fLength",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fWidth",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fSize",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fConc",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fConc1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fAsym",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fM3Long",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fM3Trans",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fAlpha",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fDist",
+          "type": "numeric"
+        }
+      ],
+      "id": 44125,
+      "label_map": {
+        "g": 0,
+        "h": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 10,
+      "n_numeric": 10,
+      "n_rows": 13376,
+      "name": "MagicTelescope",
+      "notes": "Grinsztajn et al. 2022 benchmark (OpenML 44125); original OpenML 1120, UCI MAGIC Gamma Telescope (Bock et al. 2004).",
+      "original_shape": [
+        13376,
+        11
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "05ef682aa659aa803a1989916d57b473a32519757c63735022b3a950c9453ea2",
+      "url": "https://www.openml.org/d/44125"
+    },
+    "Run_or_walk_information": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "a285781669c7078587522320bc5582d0a123207991a3a364d9ae7fe0384ad2d3",
+      "class_counts": {
+        "0": 44223,
+        "1": 44365
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.989843455127418,
+            0.9912320115296347,
+            0.9902490073072557
+          ],
+          "mean": 0.9904414913214361
+        },
+        "logreg": {
+          "folds": [
+            0.7128251287888819,
+            0.718652074021702,
+            0.7156388886590108
+          ],
+          "mean": 0.7157053638231984
+        },
+        "settings": {
+          "code_commit": "a93eec6961504505613e2769212bb5f14eebfa98-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.919737665777944,
+            0.9161375855986874,
+            0.9173608257130876
+          ],
+          "mean": 0.9177453590299063
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "acceleration_x",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "acceleration_y",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "acceleration_z",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "gyro_x",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "gyro_y",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "gyro_z",
+          "type": "numeric"
+        }
+      ],
+      "id": 40922,
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 6,
+      "n_numeric": 6,
+      "n_rows": 88588,
+      "name": "Run_or_walk_information",
+      "notes": "OpenML 40922, originally Kaggle.",
+      "original_shape": [
+        88588,
+        7
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "3d9603dce5d00fab3651ac231c7265f9700b2855a0257fe16da8ec61185a8e22",
+      "url": "https://www.openml.org/d/40922"
+    },
+    "accelerometer": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"1\": 0, \"2\": 1, \"3\": 2}",
+          "effect": "3 classes"
+        }
+      ],
+      "checksum": "8d028d3aee8e9f398f7c51cfcd3fa7316994fbd6e4ff280597dd8aa7572c3452",
+      "class_counts": {
+        "0": 51000,
+        "1": 51000,
+        "2": 51000
+      },
+      "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.7235686274509804,
+            0.722313725490196,
+            0.7264509803921569
+          ],
+          "mean": 0.7241111111111111
+        },
+        "logreg": {
+          "folds": [
+            0.32435294117647057,
+            0.35111764705882353,
+            0.41368627450980394
+          ],
+          "mean": 0.36305228758169933
+        },
+        "settings": {
+          "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.48072549019607846,
+            0.47847058823529415,
+            0.4808823529411765
+          ],
+          "mean": 0.48002614379084974
+        }
+      },
+      "duplicate_rows": 6786,
+      "features": [
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "numeric",
+          "name": "pctid",
+          "type": "numeric"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "numeric",
+          "name": "x",
+          "type": "numeric"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "numeric",
+          "name": "y",
+          "type": "numeric"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "numeric",
+          "name": "z",
+          "type": "numeric"
+        }
+      ],
+      "id": "accelerometer (1).csv",
+      "label_map": {
+        "1": 0,
+        "2": 1,
+        "3": 2
+      },
+      "n_boolean": 0,
+      "n_classes": 3,
+      "n_features": 4,
+      "n_numeric": 4,
+      "n_rows": 153000,
+      "name": "accelerometer",
+      "notes": "UCI 846; 3 configurations, 51,000 rows each (already balanced). No published reference accuracy for this task.",
+      "original_shape": [
+        153000,
+        5
+      ],
+      "retrieved": "2026-10-07",
+      "source": "zip",
+      "source_checksum": "00557d031124defb8cebc6ae62cb1833e4cadde546c6c2b1997a8925d92816b0",
+      "url": "https://archive.ics.uci.edu/dataset/846/accelerometer"
+    },
+    "appendicitis": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "da050ec923def9006459568395e37014411fcd15fa9aaa9740cbff8c9a7bd5e2",
+      "class_counts": {
+        "0": 85,
+        "1": 21
+      },
+      "code_commit": "0e159dbc19b25c26ac05c5d794dd1a558f8c21b5-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.7684729064039408,
+            0.6428571428571428,
+            0.8571428571428572
+          ],
+          "mean": 0.7561576354679803
+        },
+        "logreg": {
+          "folds": [
+            0.7684729064039408,
+            0.625,
+            0.8571428571428572
+          ],
+          "mean": 0.7502052545155994
+        },
+        "settings": {
+          "code_commit": "9a4b795ab055355f0a8dd6160dcb0cbacb6d84a0",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.6970443349753694,
+            0.5892857142857143,
+            0.8214285714285714
+          ],
+          "mean": 0.7025862068965516
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At5",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At6",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "At7",
+          "type": "numeric"
+        }
+      ],
+      "id": "appendicitis",
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 7,
+      "n_numeric": 7,
+      "n_rows": 106,
+      "name": "appendicitis",
+      "notes": "",
+      "original_shape": [
+        106,
+        8
+      ],
+      "retrieved": "2026-10-02",
+      "source": "pmlb",
+      "source_checksum": "f9c29759b57b715c8a6e9d5b017803d9edaf1f95ec296c526fd8d1ffcb35a86d",
+      "url": "https://epistasislab.github.io/pmlb/profile/appendicitis.html"
+    },
+    "bank_marketing": {
+      "changes": [
+        {
+          "action": "drop_column",
+          "detail": "V12: call duration, known only after the call; leaks the label",
+          "effect": "1 column"
+        },
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"1\": 0, \"2\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "cast",
+          "detail": "uint8 → int64",
+          "effect": "4 columns"
+        }
+      ],
+      "checksum": "4e6a6882b0e071f6eb4cd60a58b9e31f697d61d2acfdd1da8b864c138fc12c2e",
+      "class_counts": {
+        "0": 5289,
+        "1": 5289
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.6554169030062393,
+            0.6684628474191718,
+            0.6625070901871809
+          ],
+          "mean": 0.662128946870864
+        },
+        "logreg": {
+          "folds": [
+            0.6245036868973342,
+            0.6029495178672717,
+            0.6134429948950653
+          ],
+          "mean": 0.6136320665532237
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.6230856494611458,
+            0.6137266023823029,
+            0.6222348269994328
+          ],
+          "mean": 0.6196823596142939
+        }
+      },
+      "duplicate_rows": 31,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V6",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V10",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V13",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V14",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V15",
+          "type": "numeric"
+        }
+      ],
+      "id": 44126,
+      "label_map": {
+        "1": 0,
+        "2": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 6,
+      "n_numeric": 6,
+      "n_rows": 10578,
+      "name": "bank_marketing",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44126); original OpenML 1461, UCI 222 (Bank Marketing).",
+      "original_shape": [
+        10578,
+        8
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "ee05362ebc1a9cf74a7464a9108c5a14229ee0c5cef1871707202a5d1a0794de",
+      "url": "https://www.openml.org/d/44126"
+    },
+    "california": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"False\": 0, \"True\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "cast",
+          "detail": "uint8 → int64",
+          "effect": "1 columns"
+        }
+      ],
+      "checksum": "2d21b95392790b138d39761f4689deea8763dcd5a9507e5395398dc9c0c89334",
+      "class_counts": {
+        "0": 10317,
+        "1": 10317
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.9027333527188136,
+            0.9043326548415237,
+            0.9015702239022971
+          ],
+          "mean": 0.9028787438208781
+        },
+        "logreg": {
+          "folds": [
+            0.8245129398080837,
+            0.8453038674033149,
+            0.8236405931956964
+          ],
+          "mean": 0.831152466802365
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7377144518755452,
+            0.7433847048560629,
+            0.737132887467287
+          ],
+          "mean": 0.7394106813996317
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "MedInc",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "HouseAge",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "AveRooms",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "AveBedrms",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Population",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "AveOccup",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Latitude",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Longitude",
+          "type": "numeric"
+        }
+      ],
+      "id": 44090,
+      "label_map": {
+        "False": 0,
+        "True": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 8,
+      "n_numeric": 8,
+      "n_rows": 20634,
+      "name": "california",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44090); original cal_housing (Torgo), regression target binarised by the benchmark.",
+      "original_shape": [
+        20634,
+        9
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "e40604d8ed292c0808a0d5a9aefc50f285d931e5eecdeb9e63941501a28e4730",
+      "url": "https://www.openml.org/d/44090"
+    },
+    "codrna": {
+      "changes": [
+        {
+          "action": "densify",
+          "detail": "sparse columns stored densely, values unchanged",
+          "effect": "9 columns"
+        },
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0.0\": 0, \"1.0\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "cast",
+          "detail": "float32 → float64",
+          "effect": "8 columns"
+        }
+      ],
+      "checksum": "9d5c9c0ca06f7926677dc05270064aa17d9305bdc38c85cddaaf28f7a1edd2cf",
+      "class_counts": {
+        "0": 162855,
+        "1": 325710
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.9679054987565625,
+            0.9680068158791564,
+            0.9667817997605231
+          ],
+          "mean": 0.9675647047987473
+        },
+        "logreg": {
+          "folds": [
+            0.9475683890577508,
+            0.9463157409965921,
+            0.945569678548402
+          ],
+          "mean": 0.9464846028675815
+        },
+        "settings": {
+          "code_commit": "a93eec6961504505613e2769212bb5f14eebfa98-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7302892143317675,
+            0.7266003500046053,
+            0.7257852077001012
+          ],
+          "mean": 0.7275582573454914
+        }
+      },
+      "duplicate_rows": 145001,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X5",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X6",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X7",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X8",
+          "type": "numeric"
+        }
+      ],
+      "id": 351,
+      "label_map": {
+        "0.0": 0,
+        "1.0": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 8,
+      "n_numeric": 8,
+      "n_rows": 488565,
+      "name": "codrna",
+      "notes": "LIBSVM cod-rna benchmark (OpenML 351). About 30% duplicate rows, kept as published; they raise FEC's cache hit rate.",
+      "original_shape": [
+        488565,
+        9
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "94da8e60d3a565ff2d6bece1c8add1278dbc397cd46ef0c0d2940792938156ed",
+      "url": "https://www.openml.org/d/351"
+    },
+    "covertype": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "7230b6d06d559905d01ea385a2ec2c16470db613b591794b9c48eb6c9fa8d761",
+      "class_counts": {
+        "0": 283301,
+        "1": 283301
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.8118633119427325,
+            0.8123866856117339,
+            0.8130057983555883
+          ],
+          "mean": 0.8124185986366849
+        },
+        "logreg": {
+          "folds": [
+            0.617383569477095,
+            0.6192240161628783,
+            0.6167144951172009
+          ],
+          "mean": 0.617774026919058
+        },
+        "settings": {
+          "code_commit": "a93eec6961504505613e2769212bb5f14eebfa98-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7286835250015884,
+            0.7296196644970829,
+            0.7306142944467786
+          ],
+          "mean": 0.7296391613151499
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X5",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X6",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X7",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X8",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X9",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "X10",
+          "type": "numeric"
+        }
+      ],
+      "id": 44121,
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 10,
+      "n_numeric": 10,
+      "n_rows": 566602,
+      "name": "covertype",
+      "notes": "Grinsztajn et al. 2022 benchmark binary version (OpenML 44121): the two largest classes, balanced; original OpenML 293, UCI Covertype.",
+      "original_shape": [
+        566602,
+        11
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "abccb545f9132e695c9760c797d916cadf0f287d918a2f7481d6997c2cd4685d",
+      "url": "https://www.openml.org/d/44121"
+    },
+    "credit": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "cast",
+          "detail": "uint8 → int64",
+          "effect": "7 columns"
+        }
+      ],
+      "checksum": "f8f1f40f5d93db64386976f8020853619f60022f889bd585a2dd2951fd969d1e",
+      "class_counts": {
+        "0": 8357,
+        "1": 8357
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.7774587221823404,
+            0.7749013082854643,
+            0.7784986100030803
+          ],
+          "mean": 0.7769528801569616
+        },
+        "logreg": {
+          "folds": [
+            0.7363603732950467,
+            0.7289355858543809,
+            0.7018604177594822
+          ],
+          "mean": 0.7223854589696366
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7306173725771716,
+            0.738122582649075,
+            0.7336048026745681
+          ],
+          "mean": 0.7341149193002717
+        }
+      },
+      "duplicate_rows": 2,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "RevolvingUtilizationOfUnsecuredLines",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "age",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberOfTime30-59DaysPastDueNotWorse",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "DebtRatio",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "MonthlyIncome",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberOfOpenCreditLinesAndLoans",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberOfTimes90DaysLate",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberRealEstateLoansOrLines",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberOfTime60-89DaysPastDueNotWorse",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "NumberOfDependents",
+          "type": "numeric"
+        }
+      ],
+      "id": 44089,
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 10,
+      "n_numeric": 10,
+      "n_rows": 16714,
+      "name": "credit",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44089); original Kaggle 'Give Me Some Credit' (cs-training.csv).",
+      "original_shape": [
+        16714,
+        11
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "626a5ba91fa47922f7b2e31409cfeb3fa5d4a48d6bbfff1f451e81efbe70b418",
+      "url": "https://www.openml.org/d/44089"
+    },
+    "dry_bean": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"BARBUNYA\": 0, \"BOMBAY\": 1, \"CALI\": 2, \"DERMASON\": 3, \"HOROZ\": 4, \"SEKER\": 5, \"SIRA\": 6}",
+          "effect": "7 classes"
+        },
+        {
+          "action": "balance",
+          "detail": "undersample seed 0; before {\"0\": 1322, \"1\": 522, \"2\": 1630, \"3\": 3546, \"4\": 1928, \"5\": 2027, \"6\": 2636}",
+          "effect": "13611 → 3654 rows"
+        }
+      ],
+      "checksum": "7f2a01809f60e4f01d11aebde8cb3dd36b03dc541c43ddae35533e846d23f8ed",
+      "class_counts": {
+        "0": 522,
+        "1": 522,
+        "2": 522,
+        "3": 522,
+        "4": 522,
+        "5": 522,
+        "6": 522
+      },
+      "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.925287356321839,
+            0.925287356321839,
+            0.9285714285714287
+          ],
+          "mean": 0.9263820470717022
+        },
+        "logreg": {
+          "folds": [
+            0.9211822660098522,
+            0.9244663382594417,
+            0.9318555008210181
+          ],
+          "mean": 0.9258347016967706
+        },
+        "settings": {
+          "code_commit": "0bdaa4c897c75db3770cb7aa7a28317a396f1aae-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.4269293924466338,
+            0.42775041050903123,
+            0.42857142857142855
+          ],
+          "mean": 0.42775041050903123
+        }
+      },
+      "duplicate_rows": 4,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Area",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Perimeter",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "MajorAxisLength",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "MinorAxisLength",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "AspectRatio",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Eccentricity",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "ConvexArea",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "EquivDiameter",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Extent",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Solidity",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Roundness",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "Compactness",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "ShapeFactor1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "ShapeFactor2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "ShapeFactor3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "ShapeFactor4",
+          "type": "numeric"
+        }
+      ],
+      "id": 602,
+      "label_map": {
+        "BARBUNYA": 0,
+        "BOMBAY": 1,
+        "CALI": 2,
+        "DERMASON": 3,
+        "HOROZ": 4,
+        "SEKER": 5,
+        "SIRA": 6
+      },
+      "n_boolean": 0,
+      "n_classes": 7,
+      "n_features": 16,
+      "n_numeric": 16,
+      "n_rows": 3654,
+      "name": "dry_bean",
+      "notes": "UCI 602, Koklu & Ozkan 2020; 7 classes. Reference: SVM accuracy 0.931 (original paper).",
+      "original_shape": [
+        13611,
+        17
+      ],
+      "retrieved": "2026-10-05",
+      "source": "uci",
+      "source_checksum": "a1aedad37f39f792a19572c5049d24dbee1b16360813c86ffdeb6312d5cfc98e",
+      "url": "https://archive.ics.uci.edu/dataset/602/dry+bean+dataset"
+    },
+    "electricity": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"DOWN\": 0, \"UP\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "bf5f0391aedec728f04e3bbebb5c67962b9543949a91ddd2b7c02c20be9b078a",
+      "class_counts": {
+        "0": 19237,
+        "1": 19237
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.852788544868361,
+            0.8658083276726869,
+            0.8605739238927012
+          ],
+          "mean": 0.8597235988112497
+        },
+        "logreg": {
+          "folds": [
+            0.7316121563352045,
+            0.7490890720356217,
+            0.7397067997504678
+          ],
+          "mean": 0.7401360093737646
+        },
+        "settings": {
+          "code_commit": "a93eec6961504505613e2769212bb5f14eebfa98-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.72575704722521,
+            0.7379463857092371,
+            0.7333125389893949
+          ],
+          "mean": 0.7323386573079474
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "date",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "period",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "nswprice",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "nswdemand",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "vicprice",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "vicdemand",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "transfer",
+          "type": "numeric"
+        }
+      ],
+      "id": 44120,
+      "label_map": {
+        "DOWN": 0,
+        "UP": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 7,
+      "n_numeric": 7,
+      "n_rows": 38474,
+      "name": "electricity",
+      "notes": "Grinsztajn et al. 2022 benchmark (OpenML 44120); original OpenML 151, Harries 1999 elec2. `date` kept, as in the benchmark.",
+      "original_shape": [
+        38474,
+        8
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "aafcf697748721a9c4afe2720c8033f325d077a247f1ab509fb58523d4558292",
+      "url": "https://www.openml.org/d/44120"
+    },
+    "electricity_cat": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"DOWN\": 0, \"UP\": 1}",
+          "effect": "2 classes"
+        },
+        {
+          "action": "one_hot",
+          "detail": "day: 7 values",
+          "effect": "7 columns"
+        }
+      ],
+      "checksum": "d3417c2f65d0eaed67c49bcbba165d80449736b8a1b8d331ebd2924f0d85ad2f",
+      "class_counts": {
+        "0": 19237,
+        "1": 19237
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.8738407631527467,
+            0.881091015316187,
+            0.8821740486587648
+          ],
+          "mean": 0.8790352757092329
+        },
+        "logreg": {
+          "folds": [
+            0.7445567448722714,
+            0.7582109732268525,
+            0.7480505302557704
+          ],
+          "mean": 0.7502727494516314
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.72575704722521,
+            0.7379463857092371,
+            0.7333125389893949
+          ],
+          "mean": 0.7323386573079474
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "date",
+          "type": "numeric"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=0",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=1",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=2",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=3",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=4",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=5",
+          "type": "boolean"
+        },
+        {
+          "declared": null,
+          "flags": [],
+          "inferred": "boolean",
+          "name": "day=6",
+          "type": "boolean"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "period",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "nswprice",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "nswdemand",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "vicprice",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "vicdemand",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "transfer",
+          "type": "numeric"
+        }
+      ],
+      "id": 44156,
+      "label_map": {
+        "DOWN": 0,
+        "UP": 1
+      },
+      "n_boolean": 7,
+      "n_classes": 2,
+      "n_features": 14,
+      "n_numeric": 7,
+      "n_rows": 38474,
+      "name": "electricity_cat",
+      "notes": "Grinsztajn et al. 2022 categorical classification benchmark (OpenML 44156); original OpenML 151 (Harries 1999 elec2); the numerical suite's version is `electricity` (44120).",
+      "original_shape": [
+        38474,
+        9
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "e96140c780e7d8df8e3e7873983c9f4c113c10cfe9d39fb8f38dd8683f146c18",
+      "url": "https://www.openml.org/d/44156"
+    },
+    "house_16H": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"N\": 0, \"P\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "47b899b731b4556622bb3aa0f742068288138f3fdaade79e839a81030bbb2b26",
+      "class_counts": {
+        "0": 6744,
+        "1": 6744
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.8827846975088969,
+            0.8887900355871886,
+            0.8734430604982206
+          ],
+          "mean": 0.8816725978647687
+        },
+        "logreg": {
+          "folds": [
+            0.8173932384341637,
+            0.8254003558718861,
+            0.8216192170818506
+          ],
+          "mean": 0.8214709371293001
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7755782918149465,
+            0.7646797153024911,
+            0.7689056939501779
+          ],
+          "mean": 0.7697212336892051
+        }
+      },
+      "duplicate_rows": 1,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P5p1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P6p2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P11p4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P14p9",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P15p1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P15p3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P16p2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P18p2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "P27p4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H2p2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H8p2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H10p1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H13p1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H18pA",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "H40p4",
+          "type": "numeric"
+        }
+      ],
+      "id": 44123,
+      "label_map": {
+        "N": 0,
+        "P": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 16,
+      "n_numeric": 16,
+      "n_rows": 13488,
+      "name": "house_16H",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44123); original OpenML 821.",
+      "original_shape": [
+        13488,
+        17
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "aaf0e93ac6c5ea8a276fa49ccdbfdc2e7c02cdd907b9f8ec6c716eae472ce8bc",
+      "url": "https://www.openml.org/d/44123"
+    },
+    "iris": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1, \"2\": 2}",
+          "effect": "3 classes"
+        }
+      ],
+      "checksum": "ef78936faac1e362e06707fcf5eafeb446eeca396f100c7a5b2c0c3f0b741a35",
+      "class_counts": {
+        "0": 50,
+        "1": 50,
+        "2": 50
+      },
+      "code_commit": "0e159dbc19b25c26ac05c5d794dd1a558f8c21b5-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.9607843137254902,
+            0.9178921568627452,
+            1.0
+          ],
+          "mean": 0.9595588235294118
+        },
+        "logreg": {
+          "folds": [
+            0.9607843137254902,
+            0.9203431372549019,
+            1.0
+          ],
+          "mean": 0.960375816993464
+        },
+        "settings": {
+          "code_commit": "c3cf3e575497404668135e4290404d5c1134f018-dirty",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.9411764705882352,
+            0.9203431372549019,
+            0.9607843137254902
+          ],
+          "mean": 0.9407679738562091
+        }
+      },
+      "duplicate_rows": 3,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "sepal-length",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "sepal-width",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "petal-length",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "petal-width",
+          "type": "numeric"
+        }
+      ],
+      "id": "iris",
+      "label_map": {
+        "0": 0,
+        "1": 1,
+        "2": 2
+      },
+      "n_boolean": 0,
+      "n_classes": 3,
+      "n_features": 4,
+      "n_numeric": 4,
+      "n_rows": 150,
+      "name": "iris",
+      "notes": "PMLB iris (Fisher 1936); 3 classes, 4 numeric features. Multiclass test dataset.",
+      "original_shape": [
+        150,
+        5
+      ],
+      "retrieved": "2026-10-02",
+      "source": "pmlb",
+      "source_checksum": "d6e57e564c701907d1063d01c8ade500ee1e6e1ffc6a70e553417985b7cb8835",
+      "url": "https://epistasislab.github.io/pmlb/profile/iris.html"
+    },
+    "lhc_jets": {
+      "changes": [
+        {
+          "action": "drop_column",
+          "detail": "d2_a1_b1_mmdt: identical to d2_b1_mmdt in every row",
+          "effect": "1 column"
+        },
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"g\": 0, \"q\": 1, \"t\": 2, \"w\": 3, \"z\": 4}",
+          "effect": "5 classes"
+        },
+        {
+          "action": "balance",
+          "detail": "undersample seed 0; before {\"0\": 167125, \"1\": 161066, \"2\": 167851, \"3\": 167083, \"4\": 166875}",
+          "effect": "830000 → 805330 rows"
+        },
+        {
+          "action": "cast",
+          "detail": "uint8 → int64",
+          "effect": "1 columns"
+        }
+      ],
+      "checksum": "04fe9ebf1f1af15cbf98e75e94435dea844d2d3a8a131caeaae75c60aa8b45d5",
+      "class_counts": {
+        "0": 161066,
+        "1": 161066,
+        "2": 161066,
+        "3": 161066,
+        "4": 161066
+      },
+      "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.7628446571373952,
+            0.7640130875769374,
+            0.763163756512681
+          ],
+          "mean": 0.7633405004090045
+        },
+        "logreg": {
+          "folds": [
+            0.6885275182325897,
+            0.6894906762243638,
+            0.6896845052325521
+          ],
+          "mean": 0.6892342332298352
+        },
+        "settings": {
+          "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.502176248139298,
+            0.5005344829261503,
+            0.5004370836616749
+          ],
+          "mean": 0.5010492715757077
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "zlogz",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "c1_b0_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "c1_b1_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "c1_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "c2_b1_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "c2_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "d2_b1_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "d2_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "d2_a1_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "m2_b1_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "m2_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "n2_b1_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "n2_b2_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "mass_mmdt",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "multiplicity",
+          "type": "numeric"
+        }
+      ],
+      "id": 42468,
+      "label_map": {
+        "g": 0,
+        "q": 1,
+        "t": 2,
+        "w": 3,
+        "z": 4
+      },
+      "n_boolean": 0,
+      "n_classes": 5,
+      "n_features": 15,
+      "n_numeric": 15,
+      "n_rows": 805330,
+      "name": "lhc_jets",
+      "notes": "hls4ml LHC jet tagging, 16 high-level features; 5 classes. Reference: about 0.75 accuracy in the hls4ml papers (to be confirmed from the paper).",
+      "original_shape": [
+        830000,
+        17
+      ],
+      "retrieved": "2026-10-07",
+      "source": "openml",
+      "source_checksum": "3986e82a77e264398e6537f6c7dd7c8d54b7f3b46e3f0324dcb769d5ee3e2084",
+      "url": "https://www.openml.org/d/42468"
+    },
+    "phoneme_balanced": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"1\": 0, \"2\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "72fcfc32b8ec86900e0a4e303eedee1b965f74e7ad0f8e3ab9b0a2487dfe5152",
+      "class_counts": {
+        "0": 1586,
+        "1": 1586
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.8742911153119093,
+            0.8808089161940769,
+            0.8798297244658304
+          ],
+          "mean": 0.8783099186572721
+        },
+        "logreg": {
+          "folds": [
+            0.7287334593572778,
+            0.7502756773787019,
+            0.7492588932806324
+          ],
+          "mean": 0.7427560100055374
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7523629489603025,
+            0.7570297731568998,
+            0.7453510769318898
+          ],
+          "mean": 0.7515812663496974
+        }
+      },
+      "duplicate_rows": 9,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V5",
+          "type": "numeric"
+        }
+      ],
+      "id": 44127,
+      "label_map": {
+        "1": 0,
+        "2": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 5,
+      "n_numeric": 5,
+      "n_rows": 3172,
+      "name": "phoneme_balanced",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44127); original OpenML 1489. Named phoneme_balanced: PMLB's `phoneme` (5,404 rows) is a different table; the benchmark balanced it to 3,172.",
+      "original_shape": [
+        3172,
+        6
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "4e4038de03f45a13a02da67bffa0be636b8037fa67b6d6920521decc4dfaec03",
+      "url": "https://www.openml.org/d/44127"
+    },
+    "prnn_crabs": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "17f60ff64e273adc5fae5786b6933ecffcf6e3e2130e8a54e2e5d6482dfe009c",
+      "class_counts": {
+        "0": 100,
+        "1": 100
+      },
+      "code_commit": "0e159dbc19b25c26ac05c5d794dd1a558f8c21b5-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.9255793226381461,
+            0.8792335115864527,
+            0.8787878787878788
+          ],
+          "mean": 0.8945335710041592
+        },
+        "logreg": {
+          "folds": [
+            0.9696969696969697,
+            1.0,
+            1.0
+          ],
+          "mean": 0.98989898989899
+        },
+        "settings": {
+          "code_commit": "9a4b795ab055355f0a8dd6160dcb0cbacb6d84a0",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.5873440285204992,
+            0.6528520499108734,
+            0.6212121212121212
+          ],
+          "mean": 0.6204693998811646
+        }
+      },
+      "duplicate_rows": 0,
+      "features": [
+        {
+          "declared": "boolean",
+          "flags": [],
+          "inferred": "boolean",
+          "name": "sex",
+          "type": "boolean"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "index",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "FL",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "RW",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "CL",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "CW",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "BD",
+          "type": "numeric"
+        }
+      ],
+      "id": "prnn_crabs",
+      "label_map": {
+        "0": 0,
+        "1": 1
+      },
+      "n_boolean": 1,
+      "n_classes": 2,
+      "n_features": 7,
+      "n_numeric": 6,
+      "n_rows": 200,
+      "name": "prnn_crabs",
+      "notes": "",
+      "original_shape": [
+        200,
+        8
+      ],
+      "retrieved": "2026-10-02",
+      "source": "pmlb",
+      "source_checksum": "3dc6fe9a713759d4cbfa47e39617fe2ff462e3be09f0b2affa4adb926febffa4",
+      "url": "https://epistasislab.github.io/pmlb/profile/prnn_crabs.html"
+    },
+    "sleep": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"0\": 0, \"1\": 1, \"2\": 2, \"3\": 3, \"5\": 4}",
+          "effect": "5 classes"
+        },
+        {
+          "action": "balance",
+          "detail": "undersample seed 0; before {\"0\": 21359, \"1\": 9052, \"2\": 52698, \"3\": 10832, \"4\": 11967}",
+          "effect": "105908 → 45260 rows"
+        },
+        {
+          "action": "override_type",
+          "detail": "V3: declared nominal -> numeric (0-10 levels like V0-V12; PMLB's profile page and OpenML treat all 13 as numeric, only metadata.yaml tags V3 categorical)",
+          "effect": "1 column"
+        }
+      ],
+      "checksum": "4929b865b2cd21c9bca9b061d01e1ed38bcf50cea86f26ee103a946f423ef1e9",
+      "class_counts": {
+        "0": 9052,
+        "1": 9052,
+        "2": 9052,
+        "3": 9052,
+        "4": 9052
+      },
+      "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.713943452312311,
+            0.7174254000908921,
+            0.719470691045419
+          ],
+          "mean": 0.716946514482874
+        },
+        "logreg": {
+          "folds": [
+            0.6636378392994151,
+            0.6669842397388951,
+            0.6690911211550715
+          ],
+          "mean": 0.6665710667311272
+        },
+        "settings": {
+          "code_commit": "a89cb737176937aa2f73978b08f7c20ebff33c84",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.46940669539277435,
+            0.46732318496489855,
+            0.4682863815889329
+          ],
+          "mean": 0.4683387539822019
+        }
+      },
+      "duplicate_rows": 57,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V0",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V1",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V2",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V3",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V4",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V5",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V6",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V7",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V8",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V9",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V10",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V11",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "V12",
+          "type": "numeric"
+        }
+      ],
+      "id": "sleep",
+      "label_map": {
+        "0": 0,
+        "1": 1,
+        "2": 2,
+        "3": 3,
+        "5": 4
+      },
+      "n_boolean": 0,
+      "n_classes": 5,
+      "n_features": 13,
+      "n_numeric": 13,
+      "n_rows": 45260,
+      "name": "sleep",
+      "notes": "PMLB sleep; 5 classes; no source, description or publication in PMLB's metadata. All 13 features numeric (V3 overridden). No published reference accuracy found (not on UCI or OpenML).",
+      "original_shape": [
+        105908,
+        14
+      ],
+      "retrieved": "2026-10-07",
+      "source": "pmlb",
+      "source_checksum": "c11cf86c43c5f398db5b47bcdf51fef36dfdd5f5911067a53276d034756d9582",
+      "url": "https://epistasislab.github.io/pmlb/profile/sleep.html"
+    },
+    "wine_quality": {
+      "changes": [
+        {
+          "action": "drop_missing_rows",
+          "detail": "rows with any missing value",
+          "effect": "0 rows"
+        },
+        {
+          "action": "encode_label",
+          "detail": "{\"False\": 0, \"True\": 1}",
+          "effect": "2 classes"
+        }
+      ],
+      "checksum": "09abc29128caed4c44a26786f21bff2b602daaa6d7bad5cf17062e864f72ac96",
+      "class_counts": {
+        "0": 1277,
+        "1": 1277
+      },
+      "code_commit": "90d2b093c5ff5d880905de21578ffe695b2dc98c-dirty",
+      "difficulty": {
+        "gradient_boosting": {
+          "folds": [
+            0.7981220657276995,
+            0.7990941728804197,
+            0.7966694283347142
+          ],
+          "mean": 0.7979618889809444
+        },
+        "logreg": {
+          "folds": [
+            0.7312206572769953,
+            0.7497017398508699,
+            0.7355647611157139
+          ],
+          "mean": 0.7388290527478597
+        },
+        "settings": {
+          "code_commit": "e3b643e2225390e289a60d1444a1c647f4e13f73",
+          "cv": "StratifiedKFold(n_splits=3, shuffle=True, random_state=0)",
+          "models": {
+            "gradient_boosting": "HistGradientBoostingClassifier(early_stopping=False, random_state=0)",
+            "logreg": "Pipeline(steps=[('standardscaler', StandardScaler()),\n                ('logisticregression', LogisticRegression(max_iter=5000))])",
+            "tree_depth2": "DecisionTreeClassifier(max_depth=2, random_state=0)"
+          },
+          "scoring": "balanced_accuracy",
+          "sklearn_version": "1.8.0"
+        },
+        "tree_depth2": {
+          "folds": [
+            0.7206572769953051,
+            0.7203673018503176,
+            0.7107870753935377
+          ],
+          "mean": 0.7172705514130534
+        }
+      },
+      "duplicate_rows": 323,
+      "features": [
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "fixed acidity",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "volatile acidity",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "citric acid",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "residual sugar",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "chlorides",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "free sulfur dioxide",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "total sulfur dioxide",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "density",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "pH",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "sulphates",
+          "type": "numeric"
+        },
+        {
+          "declared": "numeric",
+          "flags": [],
+          "inferred": "numeric",
+          "name": "alcohol",
+          "type": "numeric"
+        }
+      ],
+      "id": 44091,
+      "label_map": {
+        "False": 0,
+        "True": 1
+      },
+      "n_boolean": 0,
+      "n_classes": 2,
+      "n_features": 11,
+      "n_numeric": 11,
+      "n_rows": 2554,
+      "name": "wine_quality",
+      "notes": "Grinsztajn et al. 2022 numerical classification benchmark (OpenML 44091); original UCI Wine Quality, regression target binarised by the benchmark. Named wine_quality: `wine` in DataComplexity is the classic 3-class UCI Wine (178 rows).",
+      "original_shape": [
+        2554,
+        12
+      ],
+      "retrieved": "2026-10-02",
+      "source": "openml",
+      "source_checksum": "186e8091b46ded1fb558e4a59751c6c0293ecbab5eda4cc7666f85859adf7a3e",
+      "url": "https://www.openml.org/d/44091"
+    }
+  }
+}
