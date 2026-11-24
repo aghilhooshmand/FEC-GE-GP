@@ -44,7 +44,7 @@ def base_recipe(**extra):
     return r
 
 
-# ---------------------------------------------------------------- foundation (T010)
+# ---------------------------------------------------------------- foundation
 
 @pytest.mark.parametrize("extra, message", [
     ({"source_label": "nope"}, "label column"),
@@ -126,7 +126,7 @@ def test_types_override():
     assert ds.override_types({"V3": "nominal"}, {}) == ({"V3": "nominal"}, [])
 
 
-# ---------------------------------------------------------------- US1: verify, compare-reference (T011)
+# ---------------------------------------------------------------- verify, compare-reference
 
 def test_verify_reports_every_problem(data_dir, capsys):
     recipes = {"t": manual_recipe(data_dir, "t", small()), "never_built": base_recipe(retrieved="2026-10-02")}
@@ -170,7 +170,7 @@ def test_unknown_openml_id(data_dir):
     assert not (data_dir / "nothing.csv").exists() and "nothing" not in ds.read_corpus()["datasets"]
 
 
-# ---------------------------------------------------------------- US2: manual downloads (T020)
+# ---------------------------------------------------------------- manual downloads
 
 def test_manual_download_ok(data_dir):
     entry = ds.recreate("m", manual_recipe(data_dir, "m", small()))
@@ -194,7 +194,7 @@ def test_manual_file_changed(data_dir):
     assert not (data_dir / "m.csv").exists() and "m" not in ds.read_corpus()["datasets"]
 
 
-# ---------------------------------------------------------------- US3: provenance (T023)
+# ---------------------------------------------------------------- provenance
 
 def test_classify_features():
     df = pd.DataFrame({"bin": [0, 1, 0, 1], "num2": [0.0, 1.0, 1.0, 0.0], "const": [3.0] * 4,
@@ -228,7 +228,7 @@ def test_record_has_every_field(data_dir):
     assert json.loads((data_dir / "corpus.json").read_text())["datasets"]["m"] == entry
 
 
-# ---------------------------------------------------------------- US4: difficulty (T028)
+# ---------------------------------------------------------------- difficulty
 
 def test_difficulty_repeatable(data_dir):
     crabs = pd.read_csv(REPO_DATA / "prnn_crabs.csv").rename(columns={"target": "class"})

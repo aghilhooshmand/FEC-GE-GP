@@ -215,7 +215,12 @@ def evolve(pset, compile_fn, points_train, points_test, p: dict, seed: int, eval
     toolbox.register("expr", gen_half_and_half, pset=pset, min_=p["min_init_depth"], max_=p["max_init_depth"])
     toolbox.register("individual", tools.initIterate, creator.IndividualGP, toolbox.expr)
     toolbox.register("population", tools.initRepeat, list, toolbox.individual)
-    toolbox.register("select", tools.selTournament, tournsize=p["tournsize"])
+    rec = getattr(evaluate, "rec", None)                # instrument.Recorder or None (recording only)
+    if rec is not None:
+        import instrument
+        toolbox.register("select", instrument.select_tournament, tournsize=p["tournsize"], rec=rec)
+    else:
+        toolbox.register("select", tools.selTournament, tournsize=p["tournsize"])
     toolbox.register("mate", cx_one_point)
     toolbox.register("mutate", gp.mutUniform, expr=toolbox.expr, pset=pset)
     limit = gp.staticLimit(key=operator.attrgetter("height"), max_value=p["max_height"])
@@ -231,6 +236,8 @@ def evolve(pset, compile_fn, points_train, points_test, p: dict, seed: int, eval
     rows, seen = [], set()                              # seen: phenotypes so far (novelty)
     for gen in range(p["generations"] + 1):
         start = time.time()
+        if rec is not None:
+            rec.begin_generation(gen)
         if gen > 0:
             pool = valid or population
             offspring = algorithms.varAnd(toolbox.select(pool, len(population) - len(hof.items)), toolbox,
@@ -238,11 +245,15 @@ def evolve(pset, compile_fn, points_train, points_test, p: dict, seed: int, eval
         else:
             offspring = population
         outcome = {}
+        evaluated = 0
         for ind in offspring:
             if not ind.fitness.valid:
                 ind.fitness.values = evaluate(ind, points_train)
                 outcome[id(ind)] = getattr(evaluate, "last_outcome", "")
                 n_evals += 1
+                evaluated += 1
+        if rec is not None and gen > 0:
+            rec.unchanged = len(offspring) - evaluated
         if gen > 0:
             offspring.extend(hof.items)                       # elites skip variation
             population[:] = offspring
@@ -261,6 +272,8 @@ def evolve(pset, compile_fn, points_train, points_test, p: dict, seed: int, eval
                                                  seen, "GP"))
         if hasattr(evaluate, "generation_stats"):
             row.update(evaluate.generation_stats())
+        if rec is not None:                            # ins_ columns (and the snapshot at chosen generations)
+            row.update(rec.finish_generation(gen, population, valid, best, evaluate.cache_bytes()))
         rows.append(row)
         if individuals is not None:
             individuals += ge.individual_rows(gen, population, outcome)
@@ -268,7 +281,7 @@ def evolve(pset, compile_fn, points_train, points_test, p: dict, seed: int, eval
 
 
 def run(name: str, seed: int, params: dict | None = None, fec: dict | None = None,
-        save_individuals: bool = False, phase_timing: bool = False) -> dict:
+        save_individuals: bool = False, phase_timing: bool = False, instrument: bool = False) -> dict:
     """One typed-GP run: baseline, or FEC (same options as ge.run)."""
     overrides = dict(params or {})
     bad = [k for k in overrides if k not in PARAMS]
@@ -277,7 +290,7 @@ def run(name: str, seed: int, params: dict | None = None, fec: dict | None = Non
     p = {**PARAMS, **overrides}
     pset, args = primitive_set(name)
     compile_fn = make_compile(pset, args)
-    r = ge.start_run(name, seed, p, overrides, fec, compile_fn, phase_timing)
+    r = ge.start_run(name, seed, p, overrides, fec, compile_fn, phase_timing, instrument)
     individuals = [] if save_individuals else None
     rows, hof, n_evals = evolve(pset, compile_fn, r["train"], r["test"], p, seed, r["evaluate"], individuals)
     result = ge.finish_run("GP", name, seed, p, overrides, r, rows, hof.items[0], n_evals, compile_fn)
@@ -312,12 +325,13 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--fps-cache", action="store_true")
     r.add_argument("--save-individuals", action="store_true")
     r.add_argument("--phase-timing", action="store_true")
+    r.add_argument("--instrument", action="store_true", help="instrumented FEC diagnostic run")
     args = p.parse_args(argv)
     try:
         fec_opts = {"fraction": args.fraction, "diagnostic": args.diagnostic, "sampler": args.sampler,
                     "fps_cache": args.fps_cache} if args.fraction else None
         result = run(args.name, args.seed, parse_overrides(args.param), fec_opts, args.save_individuals,
-                     args.phase_timing)
+                     args.phase_timing, args.instrument)
         path = ge.save_result(result)
         print(f"{args.name} GP seed {args.seed}: train error {result['best_train_error']:.4f}, "
               f"test error {result['best_test_error']:.4f}, {result['wall_time_sec']:.1f} s -> {path}")
@@ -328,6 +342,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"twin check: {'ok' if t['ok'] else 'MISMATCH ' + ', '.join(t['mismatches'])} ({t['twin']})")
             if not t["ok"]:
                 print(f"FAIL {args.name} seed {args.seed}: phase-timed run differs from its stored twin")
+                return 1
+        if args.instrument:                             # must reproduce both stored twins
+            import instrument
+            t = instrument.check_twin(path)
+            print(f"twin check: {'ok' if t['ok'] else 'MISMATCH ' + ', '.join(t['mismatches'])} ({t['twins']})")
+            if not t["ok"]:
+                print(f"FAIL {args.name} seed {args.seed}: instrumented run differs from its stored twin")
                 return 1
         return 0
     except DatasetError as exc:

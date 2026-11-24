@@ -1,0 +1,32 @@
+% written by paper_tables.py from results/store/datasets.csv; do not edit by hand
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{The 17 datasets, ordered by rows within each task, with rows and features as used in the experiments. Num., Bool.: numeric and boolean features; Cl.: classes; GB acc.: balanced accuracy of gradient boosting (Section~\ref{sec:exp:datasets}).}
+\label{tab:corpus}
+\small
+\centering
+\begin{tabular}{lllrrrrr}
+\toprule
+Dataset & Task & Source & Rows & Num. & Bool. & Cl. & GB acc. \\
+\midrule
+\texttt{wine\_quality} & binary & \href{https://archive.ics.uci.edu/dataset/186}{UCI 186} / \href{https://www.openml.org/d/44091}{OpenML 44091} & 2{,}554 & 11 & 0 & 2 & 0.798 \\
+\texttt{phoneme\_balanced} & binary & \href{https://www.openml.org/d/44127}{OpenML 44127} & 3{,}172 & 5 & 0 & 2 & 0.878 \\
+\texttt{bank\_marketing} & binary & \href{https://archive.ics.uci.edu/dataset/222}{UCI 222} / \href{https://www.openml.org/d/44126}{OpenML 44126} & 10{,}578 & 6 & 0 & 2 & 0.662 \\
+\texttt{MagicTelescope} & binary & \href{https://archive.ics.uci.edu/dataset/159}{UCI 159} / \href{https://www.openml.org/d/44125}{OpenML 44125} & 13{,}376 & 10 & 0 & 2 & 0.858 \\
+\texttt{house\_16H} & binary & \href{https://www.openml.org/d/44123}{OpenML 44123} & 13{,}488 & 16 & 0 & 2 & 0.882 \\
+\texttt{credit} & binary & \href{https://www.openml.org/d/44089}{OpenML 44089} & 16{,}714 & 10 & 0 & 2 & 0.777 \\
+\texttt{california} & binary & \href{https://www.openml.org/d/44090}{OpenML 44090} & 20{,}634 & 8 & 0 & 2 & 0.903 \\
+\texttt{electricity} & binary & \href{https://www.openml.org/d/44120}{OpenML 44120} & 38{,}474 & 7 & 0 & 2 & 0.860 \\
+\texttt{electricity\_cat} & binary & \href{https://www.openml.org/d/44156}{OpenML 44156} & 38{,}474 & 7 & 7 & 2 & 0.879 \\
+\texttt{Diabetes130US} & binary & \href{https://archive.ics.uci.edu/dataset/296}{UCI 296} / \href{https://www.openml.org/d/45022}{OpenML 45022} & 71{,}090 & 7 & 0 & 2 & 0.607 \\
+\texttt{Run\_or\_walk\_information} & binary & \href{https://www.openml.org/d/40922}{OpenML 40922} & 88{,}588 & 6 & 0 & 2 & 0.990 \\
+\texttt{codrna} & binary & \href{https://www.openml.org/d/351}{OpenML 351} & 488{,}565 & 8 & 0 & 2 & 0.968 \\
+\texttt{covertype} & binary & \href{https://archive.ics.uci.edu/dataset/31}{UCI 31} / \href{https://www.openml.org/d/44121}{OpenML 44121} & 566{,}602 & 10 & 0 & 2 & 0.812 \\
+\texttt{dry\_bean} & multiclass & \href{https://archive.ics.uci.edu/dataset/602/dry+bean+dataset}{UCI 602} & 3{,}654 & 16 & 0 & 7 & 0.926 \\
+\texttt{sleep} & multiclass & \href{https://epistasislab.github.io/pmlb/profile/sleep.html}{PMLB} & 45{,}260 & 13 & 0 & 5 & 0.717 \\
+\texttt{accelerometer} & multiclass & \href{https://archive.ics.uci.edu/dataset/846/accelerometer}{UCI 846} & 153{,}000 & 4 & 0 & 3 & 0.724 \\
+\texttt{lhc\_jets} & multiclass & \href{https://www.openml.org/d/42468}{OpenML 42468} & 805{,}330 & 15 & 0 & 5 & 0.763 \\
+\bottomrule
+\end{tabular}
+\end{adjustwidth}
+\end{table}

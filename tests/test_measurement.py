@@ -1,4 +1,4 @@
-"""Tests for measurement.py and the evaluators' metering (spec 007 SC-001..004)."""
+"""Tests for measurement.py and the evaluators' metering."""
 import numpy as np
 import pytest
 

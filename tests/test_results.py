@@ -30,8 +30,10 @@ def test_metrics_match_measurement(runs):
 def test_integrate_refuses_two_tables(runs, tmp_path, monkeypatch):
     fake = json.loads(json.dumps(runs[0]))
     fake["table_checksum"] = "0" * 64
-    monkeypatch.setattr(results, "load_runs", lambda *a: runs + [fake])
-    monkeypatch.setattr(results, "STORE", tmp_path)
+    name = runs[0]["dataset"]
+    monkeypatch.setattr(results, "run_datasets", lambda category: [name])
+    monkeypatch.setattr(results, "_ordered_runs", lambda dataset: [(("ge", str(i)), r) for i, r in enumerate(runs + [fake])])
+    monkeypatch.setattr(results, "STORES", {**results.STORES, "FEC_Speedup": tmp_path})
     with pytest.raises(results.datasets.DatasetError, match="two tables"):
         results.integrate()
 
@@ -51,3 +53,13 @@ def test_tost_equivalence():
     assert results._tost_p(a, a + rng.normal(0, 0.002, 30)) < 0.01          # within +-1 pp
     assert results._tost_p(a, a - 0.03 + rng.normal(0, 0.002, 30)) > 0.5    # 3 pp worse
     assert np.isnan(results._tost_p(a[:3], a[:3]))                          # too few pairs
+
+
+def test_categories_split_the_datasets():
+    """FEC_Speedup holds the paper's datasets; FEC_complexity_PMLB the separate PMLB experiment's; none in both."""
+    pm = results.pmlb_datasets()
+    assert results.in_category("wine_quality", "FEC_Speedup") and not results.in_category("wine_quality", "FEC_complexity_PMLB")
+    for name in pm:
+        assert results.in_category(name, "FEC_complexity_PMLB") and not results.in_category(name, "FEC_Speedup")
+    with pytest.raises(results.datasets.DatasetError):
+        results.in_category("wine_quality", "nope")

@@ -159,7 +159,7 @@ def correlations(df: pd.DataFrame, outcomes: list[str], characteristics: list[st
 
 
 def iqr_flags(x) -> np.ndarray:
-    """True outside [Q1 - 1.5 IQR, Q3 + 1.5 IQR]; all False with fewer than 4 values."""
+    """True outside [first quartile - 1.5 IQR, third quartile + 1.5 IQR]; all False with fewer than 4 values."""
     x = np.asarray(x, dtype=float)
     ok = ~np.isnan(x)
     if ok.sum() < 4:

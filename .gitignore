@@ -18,5 +18,8 @@ results/store/*
 !results/store/datasets.csv
 !results/store/runs.csv.gz
 !results/store/phase_timing.csv.gz
+!results/store/instrumented_runs.csv
+!results/store/instrumented_generations.csv.gz
 logs/
 release_assets/
+rebuilt/

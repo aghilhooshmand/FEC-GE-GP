@@ -8,7 +8,7 @@ Per run (recorded by the evaluators, see ge.BaselineEvaluator and fec.FECEvaluat
   effort           sum over training evaluations of operator calls in the phenotype x rows evaluated
                    (fingerprint rows for a fingerprint, training rows for a full evaluation); every operator
                    weighs 1. effort_by_operator keeps the same sums per operator ("full", "sample"), so S_E
-                   under other operator weights needs no new runs (effort_with_weights).
+                   under other operator weights needs no new runs (effort_with_weights;).
   generation time  sum of the per-generation times; wall time = run start to end (FEC: + sampling).
 
 Per dataset and FEC configuration (metrics(), runs paired by seed):
@@ -215,7 +215,8 @@ def same_evolution(a: dict, b: dict) -> None:
     for k in ("hits", "misses", "n_full_evals"):
         if a["measures"].get(k, a.get("fec", {}).get(k)) != b["measures"].get(k, b.get("fec", {}).get(k)):
             problems.append(k)
-    rows = lambda r: [{k: v for k, v in g.items() if k not in _NOT_EVOLUTION} for g in r["generations"]]
+    rows = lambda r: [{k: v for k, v in g.items() if k not in _NOT_EVOLUTION and not k.startswith("ins_")}
+                      for g in r["generations"]]                       # instrumented columns are recording only
     if rows(a) != rows(b):
         problems.append("per-generation statistics")
     if problems:
@@ -255,12 +256,12 @@ def metrics(baseline: list[dict], fec: list[dict], diagnostic: list[dict] | None
            "S_wall": mean(b, "wall_time_sec") / float(np.mean([wall_time(f[s]) for s in seeds])),
            "hit_rate": hits / (hits + misses) if hits + misses else float("nan"),
            "sampling_time_sec": float(np.mean([f[s]["fec"]["sampling_time_sec"] for s in seeds]))}
-    if diagnostic:
+    if diagnostic:                     # every seed once complete; while an experiment runs, the ones done so far
         d = _by_seed(diagnostic)
-        if set(d) != set(f):
-            raise ValueError("diagnostic and timing seeds differ")
-        for s in seeds:
+        if not set(d) <= set(f):
+            raise ValueError(f"diagnostic seeds without a timing run: {sorted(set(d) - set(f))}")
+        for s in d:
             same_evolution(f[s], d[s])
-        d_hits = sum(d[s]["fec"]["hits"] for s in seeds)
-        out["fake_hit_ratio"] = sum(d[s]["fec"]["fake_hits"] for s in seeds) / d_hits if d_hits else float("nan")
+        d_hits = sum(d[s]["fec"]["hits"] for s in d)
+        out["fake_hit_ratio"] = sum(d[s]["fec"]["fake_hits"] for s in d) / d_hits if d_hits else float("nan")
     return out

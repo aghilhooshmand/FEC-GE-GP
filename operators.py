@@ -91,7 +91,7 @@ def argmax10(a, b, c, d, e, f, g, h, i, j):
 
 
 def _argmax_k(k: int):
-    """argmax11..argmax20: the same rule over k scores."""
+    """argmax11..argmax20 (separate PMLB experiment): the same rule over k scores."""
     def f(*scores):
         if len(scores) != k:
             raise TypeError(f"argmax{k} takes {k} scores, got {len(scores)}")

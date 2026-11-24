@@ -9,7 +9,8 @@ FEC samplers and fractions and the GE parameter overrides (the "setup"). Per dat
   phase diagnostic  the FEC configs again with the fake-hit check (separate phase: it changes
                     cache behaviour and so the load; pairs are checked by measurement.same_evolution)
 One job = one `python ge.py run ...` process, pinned to one hardware thread of an idle physical
-core, BLAS/OpenMP threads = 1, its own log; finished results are skipped on restart.
+core (any idle thread with hive.all_threads, diagnostic-only experiments), BLAS/OpenMP threads = 1, its own
+log; finished results are skipped on restart.
 
 Commands (python batch.py <command> experiments/<name>.yaml [--workers N] [--max-busy F]):
   plan     jobs per phase, done and remaining
@@ -53,10 +54,13 @@ class Job:
     algorithm: str = "GE"
     save_individuals: bool = False
     phase_timing: bool = False          # FEC timing runs with the phase clock, setup phase_timing
+    instrument: bool = False            # instrumented diagnostic runs, setup instrumented
 
     @property
     def setup(self) -> str:
-        return ge.phase_setup(self.overrides) if self.phase_timing else ge.setup_id(self.overrides)
+        if self.phase_timing:
+            return ge.phase_setup(self.overrides)
+        return ge.instrument_setup(self.overrides) if self.instrument else ge.setup_id(self.overrides)
 
     @property
     def tag(self) -> str:
@@ -94,6 +98,7 @@ class Job:
             cmd += ["--fps-cache"] if c["sampler"] == "farthest_point" else []
         cmd += ["--save-individuals"] if self.save_individuals else []
         cmd += ["--phase-timing"] if self.phase_timing else []
+        cmd += ["--instrument"] if self.instrument else []
         return cmd
 
 
@@ -105,7 +110,8 @@ def configs(exp: dict, mode: str = "fec") -> list[dict]:
 def plan(exp: dict, seeds=None) -> list[Job]:
     seeds = exp["seeds"] if seeds is None else seeds
     kw = {"overrides": exp["params"], "max_fraction": max(exp["fractions"]), "algorithm": exp.get("algorithm", "GE"),
-          "save_individuals": exp.get("save_individuals", False), "phase_timing": exp.get("phase_timing", False)}
+          "save_individuals": exp.get("save_individuals", False), "phase_timing": exp.get("phase_timing", False),
+          "instrument": exp.get("instrument", False)}
     names = exp["datasets"]
     modes = exp.get("modes", ["baseline", "fec", "fec_diagnostic"])
     jobs = [Job("fps", n, s, **kw) for s in seeds for n in names] if "farthest_point" in exp["samplers"] else []
@@ -149,13 +155,18 @@ def _cpu_times() -> dict[int, tuple[int, int]]:
     return out
 
 
-def free_cores(max_workers: int | None = None, interval: float = 1.0, max_busy: float = BUSY) -> list[int]:
-    """One hardware thread of each physical core whose threads are all idle (< BUSY use)."""
+def free_cores(max_workers: int | None = None, interval: float = 1.0, max_busy: float = BUSY,
+               all_threads: bool = False) -> list[int]:
+    """One hardware thread of each physical core whose threads are all idle (< BUSY use). all_threads: every
+    thread of those cores, first threads first (so N <= cores workers still get a core each); only for
+    diagnostic runs, whose times are not reported."""
     a = _cpu_times()
     time.sleep(interval)
     b = _cpu_times()
     use = {c: 1 - (b[c][1] - a[c][1]) / max(1, b[c][0] - a[c][0]) for c in b}
-    cores = [g[0] for g in physical_cores() if all(use.get(c, 1.0) < max_busy for c in g)]
+    idle = [g for g in physical_cores() if all(use.get(c, 1.0) < max_busy for c in g)]
+    cores = [g[k] for k in range(max(map(len, idle), default=0)) for g in idle if k < len(g)] if all_threads \
+        else [g[0] for g in idle]
     return cores[:max_workers] if max_workers else cores
 
 
@@ -253,6 +264,15 @@ def status(exp: dict, workers: int) -> None:
 
 
 def check_pairs(exp: dict) -> int:
+    if exp.get("instrument"):                           # each run against its stored timing and diagnostic twins
+        import instrument
+        res = [instrument.check_twin(j.out) for j in plan(exp) if j.phase == "diagnostic" and j.out.is_file()]
+        for r in res:
+            if not r["ok"]:
+                print(f"FAIL {r['path']}: {', '.join(r['mismatches'])}")
+        bad = sum(not r["ok"] for r in res)
+        print(f"check: {len(res) - bad} of {len(res)} instrumented runs reproduce both stored twins")
+        return 1 if bad else 0
     n = bad = 0
     for j in plan(exp):
         if j.phase != "diagnostic" or not j.out.is_file():
@@ -296,7 +316,11 @@ def main(argv: list[str] | None = None) -> int:
         if missing:
             print(f"FAIL pilot incomplete for {len(missing)} config(s), e.g. {missing[:3]}; run `pilot` first")
             return 1
-    cores = free_cores(workers, max_busy=max_busy)
+    all_threads = exp["hive"].get("all_threads", False)
+    if all_threads and any(j.phase != "diagnostic" for j in plan(exp)):
+        print("FAIL hive.all_threads is for diagnostic-only experiments (timing runs need a core each)")
+        return 1
+    cores = free_cores(workers, max_busy=max_busy, all_threads=all_threads)
     if not cores:
         print("FAIL no idle physical core")
         return 1

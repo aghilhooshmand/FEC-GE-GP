@@ -7,7 +7,7 @@ An experiment is experiments/<name>.yaml:
     seeds: 30-59                           # "a-b" or a list
     fec: {samplers: [farthest_point, random, stratified], fractions: [0.01, 0.05, 0.10]}
     params: {}                             # GE parameter overrides (the "setup"); usually empty
-    hive: {workers: 39, max_busy: 0.10}
+    hive: {workers: 39, max_busy: 0.10}    # all_threads: true -> both threads of a core (diagnostic-only runs)
     save_individuals: false                # true: every individual of every generation (large; small datasets)
 
 Commands (python experiment.py <command> experiments/<name>.yaml):
@@ -43,7 +43,8 @@ ROOT = datasets.ROOT
 HIVE_HOST = os.environ.get("FEC_REMOTE_HOST", "")  # user@host of the compute server
 HIVE_PATH = os.environ.get("FEC_REMOTE_PATH", "projects/FEC")   # relative to the remote home directory
 HIVE_REMOTE = os.environ.get("FEC_REMOTE_GIT", "hive")         # git remote: <host>:projects/FEC.git (bare)
-KEYS = {"name", "algorithm", "datasets", "seeds", "fec", "params", "hive", "save_individuals", "modes", "phase_timing"}
+KEYS = {"name", "algorithm", "datasets", "seeds", "fec", "params", "hive", "save_individuals", "modes", "phase_timing",
+        "instrument"}
 MODES = ("baseline", "fec", "fec_diagnostic")
 COMMITTED = ("*.py", "requirements.txt", "data/recipes.yaml", "data/corpus.json", "data/constant_ranges.csv",
              "data/complexity.csv", "grammars", "experiments")
@@ -93,10 +94,17 @@ def load(path: Path) -> dict:
     phase = raw.get("phase_timing", False)
     if not isinstance(phase, bool) or (phase and modes != ["fec"]):
         raise DatasetError(path.stem, "phase_timing: true needs modes: [fec] (FEC timing runs only)")
+    inst = raw.get("instrument", False)
+    if not isinstance(inst, bool) or (inst and modes != ["fec_diagnostic"]):
+        raise DatasetError(path.stem, "instrument: true needs modes: [fec_diagnostic] (diagnostic runs only)")
+    if not isinstance(hive.get("all_threads", False), bool) or (hive.get("all_threads") and modes != ["fec_diagnostic"]):
+        raise DatasetError(path.stem, "hive.all_threads: true needs modes: [fec_diagnostic] (timing runs need a core each)")
     return {"name": raw.get("name", path.stem), "path": path, "algorithm": algorithm, "datasets": names,
             "seeds": _seeds(raw.get("seeds", "30-59")), "samplers": samplers, "fractions": fractions,
-            "params": params, "setup": ge.phase_setup(params) if phase else ge.setup_id(params), "hive": hive,
-            "save_individuals": raw.get("save_individuals", False), "modes": modes, "phase_timing": phase}
+            "params": params, "hive": hive,
+            "setup": ge.phase_setup(params) if phase else ge.instrument_setup(params) if inst else ge.setup_id(params),
+            "save_individuals": raw.get("save_individuals", False), "modes": modes, "phase_timing": phase,
+            "instrument": inst}
 
 
 # ---------------------------------------------------------------- local steps
@@ -205,6 +213,13 @@ def fetch(exp: dict) -> None:
                 print(f"REJECT {path.relative_to(ROOT)}: table or setup differs from the laptop's")
                 path.rename(path.with_suffix(".rejected"))
                 rejected += 1
+            elif exp.get("instrument"):                     # both twin checks again on the laptop
+                import instrument
+                if instrument.check_twin(path)["ok"]:
+                    accepted += 1
+                else:
+                    print(f"MISMATCH {path.relative_to(ROOT)}: differs from a stored twin")
+                    rejected += 1
             elif exp.get("phase_timing"):                   # twin check again on the laptop
                 import phase_timing
                 if phase_timing.check_twin(path)["ok"]:

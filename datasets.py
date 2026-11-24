@@ -130,7 +130,7 @@ def compute_corpus_version(datasets: dict) -> str:
 
 
 def update_corpus_entry(name: str, entry: dict) -> None:
-    """Replace only datasets[name] () and recompute corpus_version."""
+    """Replace only datasets[name] and recompute corpus_version."""
     corpus = read_corpus()
     corpus["datasets"][name] = entry
     corpus["corpus_version"] = compute_corpus_version(corpus["datasets"])

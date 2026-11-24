@@ -1,4 +1,4 @@
-"""per-phase timing of FEC (spec to , data-model identities)."""
+"""per-phase timing of FEC."""
 import json
 from pathlib import Path
 
@@ -25,7 +25,7 @@ def _pair(mod, name, frac):
                                            (typed_gp, "prnn_crabs", 0.10), (typed_gp, "appendicitis", 0.05)])
 def test_phase_timed_run_is_its_twin_and_adds_up(mod, name, frac):
     plain, timed = _pair(mod, name, frac)
-    assert phase_timing.compare(timed, plain) == []                       # , SC-001
+    assert phase_timing.compare(timed, plain) == []
     assert "phases" not in plain and plain["setup"] == ge.setup_id(SMALL)  # default path unchanged
     assert timed["setup"] == ge.phase_setup(SMALL)
     ph, m = timed["phases"], timed["measures"]

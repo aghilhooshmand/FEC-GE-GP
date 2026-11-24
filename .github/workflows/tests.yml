@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+  release:
+    types: [published]
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install the pinned versions
+        run: pip install -r requirements.txt
+      - name: Per-generation records (release file)
+        run: |
+          url=https://github.com/${{ github.repository }}/releases/download/v1.1.0/generations.csv.gz
+          curl -fsSL -o results/store/generations.csv.gz "$url" || echo "release file not found: $url"
+      - name: Test suite (small test tables)
+        run: pytest -q
+      - name: Baseline, timing and diagnostic runs side by side
+        run: python example.py --population 200 --generations 10
+      - name: Rebuild every table and figure of the paper and compare with paper/
+        run: |
+          if [ -f results/store/generations.csv.gz ]; then python paper_tables.py --check
+          else echo "rebuild skipped: no results/store/generations.csv.gz"; fi

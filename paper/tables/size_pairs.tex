@@ -1,0 +1,19 @@
+% written by paper_tables.py from results/store/metrics.csv; do not edit by hand
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Pairs of tables of similar size and similar hit rate whose cache hits skip programs of different size (random fingerprint rows). Hit/miss size: mean size, in operator calls, of a program that hit the cache relative to one that missed it; work avoided: share of the full-evaluation work the hits avoided (both from the diagnostic runs, generations 1--30 pooled, fingerprint not counted).}
+\label{tab:size-pairs}
+\small
+\centering
+\begin{tabular}{llrrrrrr}
+\toprule
+Alg., fraction & Dataset & Rows & Cl. & Hit rate & Hit/miss size & Work avoided & $S_T$ \\
+\midrule
+GE, 1\% & \texttt{sleep} & 45{,}260 & 5 & 0.63 & 96\% & 64\% & 2.23 \\
+ & \texttt{electricity} & 38{,}474 & 2 & 0.63 & 46\% & 46\% & 1.49 \\
+\addlinespace[3pt]GE, 5\% & \texttt{dry\_bean} & 3{,}654 & 7 & 0.62 & 98\% & 64\% & 1.21 \\
+ & \texttt{phoneme\_balanced} & 3{,}172 & 2 & 0.65 & 37\% & 42\% & 0.99 \\
+\bottomrule
+\end{tabular}
+\end{adjustwidth}
+\end{table}

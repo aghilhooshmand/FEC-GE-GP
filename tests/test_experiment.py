@@ -44,3 +44,12 @@ def test_save_individuals_reaches_every_run(tmp_path):
     assert all(("--save-individuals" in j.command()) == (j.phase != "fps") for j in jobs)
     with pytest.raises(DatasetError, match="save_individuals"):
         ex.load(write(tmp_path, "datasets: [appendicitis]\nsave_individuals: yes please\n"))
+
+
+def test_all_threads_only_for_diagnostic_runs(tmp_path):
+    e = ex.load(write(tmp_path, "datasets: [appendicitis]\nmodes: [fec_diagnostic]\nhive: {all_threads: true}\n"))
+    assert e["hive"]["all_threads"] is True
+    with pytest.raises(DatasetError, match="all_threads"):
+        ex.load(write(tmp_path, "datasets: [appendicitis]\nhive: {all_threads: true}\n"))
+    with pytest.raises(DatasetError, match="all_threads"):
+        ex.load(write(tmp_path, "datasets: [appendicitis]\nmodes: [fec_diagnostic]\nhive: {all_threads: yes please}\n"))

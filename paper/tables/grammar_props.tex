@@ -1,0 +1,32 @@
+% written by paper_tables.py from results/store/datasets.csv; do not edit by hand
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{Grammar properties per dataset: range of the signed constants, smallest share of a numeric column's standardised values inside that range (coverage), share of (column, constant) pairs that split off fewer than 1\% or more than 99\% of the rows (degenerate rate), ratio of the appearance probability of boolean to numeric features in initial populations (fairness; -- when all features are numeric), and minimum initial derivation depth.}
+\label{tab:grammar-props}
+\small
+\centering
+\begin{tabular}{lrrrrr}
+\toprule
+Dataset & Constants & Coverage & Degenerate & Fairness & Init. depth \\
+\midrule
+\texttt{wine\_quality} & $\pm 2.99$ & 0.978 & 0.286 & -- & 5 \\
+\texttt{phoneme\_balanced} & $\pm 2.99$ & 0.974 & 0.298 & -- & 5 \\
+\texttt{bank\_marketing} & $\pm 2.99$ & 0.980 & 0.382 & -- & 5 \\
+\texttt{MagicTelescope} & $\pm 2.99$ & 0.974 & 0.250 & -- & 5 \\
+\texttt{house\_16H} & $\pm 2.99$ & 0.969 & 0.345 & -- & 5 \\
+\texttt{credit} & $\pm 1.99$ & 0.961 & 0.530 & -- & 5 \\
+\texttt{california} & $\pm 1.99$ & 0.958 & 0.270 & -- & 5 \\
+\texttt{electricity} & $\pm 2.99$ & 0.992 & 0.419 & -- & 5 \\
+\texttt{electricity\_cat} & $\pm 2.99$ & 0.992 & 0.419 & 0.51 & 3 \\
+\texttt{Diabetes130US} & $\pm 2.99$ & 0.984 & 0.366 & -- & 5 \\
+\texttt{Run\_or\_walk\_information} & $\pm 2.99$ & 0.958 & 0.199 & -- & 5 \\
+\texttt{codrna} & $\pm 2.99$ & 0.969 & 0.234 & -- & 5 \\
+\texttt{covertype} & $\pm 2.99$ & 0.981 & 0.280 & -- & 5 \\
+\texttt{dry\_bean} & $\pm 2.99$ & 0.985 & 0.307 & -- & 7 \\
+\texttt{sleep} & $\pm 2.99$ & 0.961 & 0.372 & -- & 7 \\
+\texttt{accelerometer} & $\pm 2.99$ & 0.970 & 0.114 & -- & 7 \\
+\texttt{lhc\_jets} & $\pm 2.99$ & 0.975 & 0.341 & -- & 7 \\
+\bottomrule
+\end{tabular}
+\end{adjustwidth}
+\end{table}

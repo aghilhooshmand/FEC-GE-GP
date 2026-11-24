@@ -29,7 +29,7 @@ def make_dataset(data_dir, name, df):
     ds.recreate(name, recipe)
 
 
-# ---------------------------------------------------------------- US1: constant range
+# ---------------------------------------------------------------- constant range
 
 def test_candidates():
     for k, n, top in [(1, 199, 0.99), (2, 399, 1.99), (3, 599, 2.99)]:
@@ -68,7 +68,7 @@ def test_record_updates_one_row(data_dir):
     assert pp.check() == 0
 
 
-# ---------------------------------------------------------------- US2: z-score per run
+# ---------------------------------------------------------------- z-score per run
 
 def test_fit_apply_zscore():
     rng = np.random.default_rng(2)

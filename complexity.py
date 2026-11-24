@@ -79,7 +79,7 @@ def load_complexity() -> pd.DataFrame:
 
 
 def write_rows(rows: list[dict]) -> None:
-    """Add or replace the rows with these names; every other row is kept exactly as read ()."""
+    """Add or replace the rows with these names; every other row is kept exactly as read."""
     for row in rows:
         unknown = set(row) - set(COLUMNS)
         if unknown:
@@ -110,7 +110,7 @@ def complexity_row(name: str) -> dict:
     return hit.iloc[0].to_dict()
 
 
-# ---------------------------------------------------------------- import (US1)
+# ---------------------------------------------------------------- import
 
 def source_provenance(source: Path) -> tuple[str, str]:
     """(commit, commit date) of the reference CSV in its own git repository."""
@@ -274,7 +274,7 @@ def compute_metrics(name: str, x: np.ndarray, y: np.ndarray, metrics, *, n_jobs:
     return values, failed
 
 
-# ---------------------------------------------------------------- compute (US2), check, compare
+# ---------------------------------------------------------------- compute, check, compare
 
 def minmax(x: np.ndarray) -> np.ndarray:
     lo, hi = x.min(axis=0), x.max(axis=0)
@@ -362,7 +362,7 @@ def check() -> int:
 
 
 def compare_reference(name: str) -> bool:
-    """the ported code on the reference's own input reproduces its non-random values."""
+    """The ported code on the reference's own input reproduces its non-random values."""
     ref = complexity_row(name)
     if ref["origin"] != "DataComplexity" or ref["preset"] not in PRESETS:
         raise DatasetError(name, f"needs an imported row with a known preset, got {ref['origin']}/{ref['preset']}")

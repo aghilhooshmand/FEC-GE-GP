@@ -2,7 +2,7 @@
 
 Constant features (one value, flagged by 001) stay in the table but not in the grammar: they can't
 split anything (the reference implementation's convention). A rule may have at most 256 alternatives (GRAPE):
-a wider feature rule is split into equal sub-rules.
+a wider feature rule is split into equal sub-rules (separate PMLB experiment).
 
 Template: the reference implementation's typed two-hop grammar (generate_dataset_grammars._typed_body_lines) without
 the direct feature-vs-feature shortcut, with the signed <constant> rule of the dataset's 003

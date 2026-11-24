@@ -32,7 +32,7 @@ def small_dataset(data_dir, name="m", n=60, seed=1):
     return recipe
 
 
-# ---------------------------------------------------------------- foundation (T004)
+# ---------------------------------------------------------------- foundation
 
 def test_write_rows_replaces_one(data_dir):
     cx.write_rows([{"name": "a", "origin": "computed", "pycol_F1": 0.5}])
@@ -58,7 +58,7 @@ def test_presets():
         assert list(metrics) == [m for m in cx.METRICS if m in metrics]
 
 
-# ---------------------------------------------------------------- US1: import (T005)
+# ---------------------------------------------------------------- import
 
 def write_source(path, rows):
     cols = list(cx.SOURCE_COLUMNS) + ["pycol_matrix_dtype", "pycol_heom_parallel", "profile_url"]
@@ -109,7 +109,7 @@ def test_import_keeps_computed_rows(data_dir, source):
     assert cx.complexity_row("d1")["origin"] == "computed" and cx.complexity_row("d1")["pycol_F1"] == "0.9"
 
 
-# ---------------------------------------------------------------- US2: compute (T008)
+# ---------------------------------------------------------------- compute
 
 REAL_INPUT = cx.REFERENCE_INPUT_DIR
 

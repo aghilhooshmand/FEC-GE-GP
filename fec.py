@@ -214,7 +214,8 @@ def cache_key(outputs: np.ndarray) -> str:
 class FECEvaluator:
     """Callable(ind, points_train) -> (fitness,) with a behaviour cache; see the module docstring."""
 
-    def __init__(self, sample_x: np.ndarray, diagnostic: bool = False, compile_fn=None, phases=None) -> None:
+    def __init__(self, sample_x: np.ndarray, diagnostic: bool = False, compile_fn=None, phases=None,
+                 instrument=None) -> None:
         """compile_fn(individual) -> x -> outputs (None if invalid), or None for an invalid individual;
         GE's by default (GP passes its own). Called once per evaluation: the same compiled individual
         runs on the fingerprint rows and, on a miss, on the training rows. phases: a measurement.PhaseClock or None; it only reads the clock, so a run evolves the same with or without it."""
@@ -231,6 +232,11 @@ class FECEvaluator:
         self._reset_generation()
         self.last_outcome = ""                         # hit / miss / invalid, for the individuals file
         self.phases = phases
+        if instrument is not None and not diagnostic:
+            raise ValueError("instrument is for FEC diagnostic runs only")
+        self.rec = instrument                          # instrument.Recorder or None: recording only
+        self.entry_id: dict[str, int] = {}             # key -> entry number and the entry's compiled program
+        self.entry_run: dict[str, object] = {}         # (its labels are recomputed at a fake hit, never stored)
 
     def _reset_generation(self) -> None:
         self.gen_keys: set[str] = set()
@@ -245,6 +251,8 @@ class FECEvaluator:
         run = self.compile(ind)
         self.last_outcome = "invalid"
         if run is None:                                # invalid individual (GE: not mapped)
+            if self.rec:
+                ind.fec_true = float("nan")
             if ph:
                 ph.lap("invalid_pre")
                 ph.count("n_invalid_pre")
@@ -253,10 +261,14 @@ class FECEvaluator:
         if ph:
             ph.lap("compile")
         text = ge.text_of(ind)
+        if self.rec:
+            self.rec.exact_lookup(text)                # shadow exact cache (never used for a fitness)
         outputs = run(self.sample_x)
         if ph:
             ph.count("n_reached_fp")
         if outputs is None:
+            if self.rec:
+                ind.fec_true = float("nan")
             if ph:
                 ph.lap("invalid_fp")
                 ph.count("n_invalid_fp")
@@ -287,19 +299,30 @@ class FECEvaluator:
             self.gen_size["hit"].append(size)
             if self.phenotype[key] == text:
                 self._count("same_phenotype_hits")
-            if self.diagnostic:                        # check only; never changes the value used
+            if self.rec:                               # same full value as below, plus labels and logs
+                self._instrumented_hit(ind, run, points, key, cached, text, size)
+            elif self.diagnostic:                      # check only; never changes the value used
                 full = self.full_fitness(run, points)
                 self.gen_diff.append(cached - full)
                 if not np.isclose(cached, full, atol=0.0, rtol=0.0, equal_nan=True):
                     self._count("fake_hits")
             return (cached,)
-        value = self.full_fitness(run, points)
+        if self.rec:                                   # the value exactly as full_fitness, plus the labels
+            import instrument
+            value, labels = instrument.full_eval(run, points)
+            ind.fec_true = value
+        else:
+            value = self.full_fitness(run, points)
         if ph:
             ph.lap("full_eval")
             ph.count("n_misses")
         if not np.isnan(value):
             self.fitness[key] = value
             self.phenotype[key] = text
+            if self.rec:
+                self.entry_id[key] = self.rec.new_entry(value, size, None if labels is None else
+                                                        __import__("instrument").label_hash(labels))
+                self.entry_run[key] = run
         if ph:
             ph.lap("store")
         m.stop()                                       # full evaluation and store done
@@ -309,6 +332,28 @@ class FECEvaluator:
         self.last_outcome = "miss"
         self.gen_size["miss"].append(size)
         return (value,)
+
+    def _instrumented_hit(self, ind, run, points, key, cached, text, size) -> None:
+        """the diagnostic check of a hit (same fake-hit count and fitness difference as the plain path) plus the
+        true fitness on the individual, the prediction match, the hit log and, for a fake hit, where the two
+        programs disagree (the stored program run once more on the training rows)."""
+        import instrument
+        full, labels = instrument.full_eval(run, points)
+        ind.fec_true = full
+        self.gen_diff.append(cached - full)
+        if not np.isclose(cached, full, atol=0.0, rtol=0.0, equal_nan=True):
+            self._count("fake_hits")
+        e = self.entry_id[key]
+        fake, _ = self.rec.on_hit(e, cached, full, self.phenotype[key] == text,
+                                  None if labels is None else instrument.label_hash(labels), size)
+        if fake:
+            _, stored = instrument.full_eval(self.entry_run[key], points)
+            self.rec.on_fake_detail(e, cached, full, labels, stored, np.asarray(points[1], dtype=np.int64))
+
+    def cache_bytes(self) -> int:
+        """bytes of the cache's own tables (fitness and phenotype by key)."""
+        import instrument
+        return instrument.cache_bytes(self.fitness, self.phenotype)
 
     def _count(self, what: str) -> None:
         self.total[what] += 1

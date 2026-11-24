@@ -6,7 +6,9 @@ Writes (all derived, rebuilt from results/ and the records; git-ignored):
   results/store/metrics.csv      per (setup, dataset, sampler, fraction): measurement.metrics + paired tests
   results/store/datasets.csv     per recipe: the properties used to choose datasets
 
-Commands: python results.py integrate | metrics | properties | all
+Commands: python results.py integrate | metrics | properties | all  [--category FEC_Speedup | FEC_complexity_PMLB | all]
+Categories: FEC_Speedup = results/store, every dataset except the separate PMLB experiment's (the
+paper reads this store); FEC_complexity_PMLB = results/store_pmlb, the datasets of experiments/pmlb_*.yaml.
 Rules: a dataset's rows are rebuilt as a whole; one dataset's runs must all be on one table
 checksum; metrics only from measurement.py; paired Wilcoxon tests on
 paired seeds (option 1), pairs checked identical first. Accuracy equivalence:
@@ -16,12 +18,14 @@ Bayesian correlated t-test with the same margin as rope (bayes_worse / bayes_rop
 from __future__ import annotations
 
 import argparse
+import functools
 import json
 import sys
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import yaml
 from scipy.stats import wilcoxon
 
 import analysis
@@ -33,7 +37,51 @@ import measurement
 import preprocessing
 
 ROOT = datasets.ROOT
-STORE = ROOT / "results" / "store"
+STORE = ROOT / "results" / "store"                  # FEC_Speedup: the paper's store
+STORES = {"FEC_Speedup": STORE, "FEC_complexity_PMLB": ROOT / "results" / "store_pmlb"}
+PMLB_EXPERIMENTS = ("pmlb_ge", "pmlb_gp")
+
+
+@functools.lru_cache(maxsize=1)
+def pmlb_datasets() -> frozenset:
+    """The datasets of the separate PMLB experiment (category FEC_complexity_PMLB)."""
+    names = set()
+    for e in PMLB_EXPERIMENTS:
+        path = ROOT / "experiments" / f"{e}.yaml"
+        if path.is_file():
+            names |= set(yaml.safe_load(path.read_text())["datasets"])
+    return frozenset(names)
+
+
+@functools.lru_cache(maxsize=1)
+def pmlb_recipes() -> frozenset:
+    """Every recipe of data/recipes.yaml's separate PMLB experiment section (also those left out of its runs)."""
+    text = (datasets.DATA_DIR / "recipes.yaml").read_text(encoding="utf-8")
+    marker = "# ---- separate PMLB experiment"
+    if marker not in text:
+        return frozenset()
+    section = yaml.safe_load(text.split(marker, 1)[1].split("\n", 1)[1]) or {}
+    return frozenset(section)
+
+
+def in_category(name: str, category: str) -> bool:
+    """FEC_complexity_PMLB: the PMLB experiment's datasets; FEC_Speedup: every other dataset, except the recipes of
+    the PMLB section that are in no experiment (they belong to neither)."""
+    if category not in STORES:
+        raise datasets.DatasetError("results", f"unknown category {category!r}; choose from {list(STORES)}")
+    if category == "FEC_complexity_PMLB":
+        return name in pmlb_datasets()
+    return name not in pmlb_datasets() and name not in pmlb_recipes()
+
+
+SEPARATE_SETUPS = ("phase_timing", "instrumented")   # 017, runs with their own tables, never in runs/generations
+
+
+def run_datasets(category: str) -> list[str]:
+    """Datasets with run files (any setup except phase timing) in this category."""
+    names = {d.name for algo in ("ge", "gp") for s in (ROOT / "results" / algo).glob("*")
+             if s.is_dir() and not s.name.startswith(SEPARATE_SETUPS) for d in s.iterdir() if d.is_dir()}
+    return sorted((n for n in names if in_category(n, category)), key=str.lower)
 MIN_PAIRS_FOR_TEST = 6
 # equivalence margin for test accuracy: FEC is "comparable" to
 # the baseline when TOST shows the paired difference within +-1 percentage point
@@ -64,40 +112,67 @@ def run_row(r: dict) -> dict:
             "code_commit": r["code_commit"]}
 
 
+def _run_paths(setup: str | None = None, dataset: str | None = None) -> list[tuple[str, Path]]:
+    """(algorithm folder, path) of every stored run, phase-timed ones excluded, in the store's order."""
+    pattern = f"{setup or '*'}/{dataset or '*'}/*/seed*.json"
+    return [(algo, p) for algo in ("ge", "gp") for p in sorted((ROOT / "results" / algo).glob(pattern))
+            if not p.relative_to(ROOT / "results" / algo).parts[0].startswith(SEPARATE_SETUPS)]
+
+
+def _ordered_runs(dataset: str) -> list[tuple[tuple, dict]]:
+    """A dataset's runs, each with its place in one global sorted walk of results/ (keeps the store's row order)."""
+    return [((algo, str(p.relative_to(ROOT / "results" / algo))), json.loads(p.read_text()))
+            for algo, p in _run_paths(dataset=dataset)]
+
+
 def load_runs(setup: str | None = None, dataset: str | None = None) -> list[dict]:
     """Every stored run except the phase-timed ones (setup phase_timing*), which have their own table and must
     never enter runs.csv, generations.csv or the metrics."""
     pattern = f"{setup or '*'}/{dataset or '*'}/*/seed*.json"
     return [json.loads(p.read_text()) for algo in ("ge", "gp") for p in sorted((ROOT / "results" / algo).glob(pattern))
-            if not p.relative_to(ROOT / "results" / algo).parts[0].startswith("phase_timing")]
+            if not p.relative_to(ROOT / "results" / algo).parts[0].startswith(SEPARATE_SETUPS)]
 
 
-def integrate() -> pd.DataFrame:
-    """Rebuild runs.csv and generations.csv from every accepted run (per dataset, checksum-guarded)."""
-    runs = load_runs()
-    rows, gens = [], []
-    for r in runs:
-        rows.append(run_row(r))
-        key = {"algorithm": r.get("algorithm", "GE"), "setup": r["setup"], "dataset": r["dataset"], "mode": r["mode"],
-               "sampler": (r.get("fec") or {}).get("sampler", ""), "fraction": (r.get("fec") or {}).get("fraction", np.nan),
-               "seed": r["seed"]}
-        gens += [{**key, **g} for g in r["generations"]]
-    df = pd.DataFrame(rows)
-    if df.empty:
-        raise datasets.DatasetError("results", "no runs under results/ge/; fetch an experiment first")
-    mixed = df.groupby("dataset")["table_checksum"].nunique()
-    if (mixed > 1).any():
-        raise datasets.DatasetError("results", f"runs on two tables for {list(mixed[mixed > 1].index)}: "
-                                               "remove the stale runs")
-    STORE.mkdir(parents=True, exist_ok=True)
-    df.to_csv(STORE / "runs.csv", index=False)
-    pd.DataFrame(gens).to_csv(STORE / "generations.csv", index=False)
-    print(f"integrate: {len(df)} runs, {df['dataset'].nunique()} dataset(s), {df['setup'].nunique()} setup(s)")
-    import phase_timing                                        # phase-timed runs, own table
-    pt = phase_timing.table()
-    if not pt.empty:
-        pt.to_csv(STORE / "phase_timing.csv", index=False)
-        print(f"integrate: {len(pt)} phase-timed run(s) -> phase_timing.csv")
+def integrate(category: str = "FEC_Speedup") -> pd.DataFrame:
+    """Rebuild runs.csv and generations.csv of a category's store from its accepted runs, one dataset at a time
+    (the run files are large; one dataset's runs must all be on one table checksum)."""
+    store = STORES[category]
+    run_frames, gen_frames = [], []
+    for name in run_datasets(category):
+        rows, gens = [], []
+        for order, r in _ordered_runs(name):
+            rows.append({**run_row(r), "_order": order})
+            key = {"algorithm": r.get("algorithm", "GE"), "setup": r["setup"], "dataset": r["dataset"],
+                   "mode": r["mode"], "sampler": (r.get("fec") or {}).get("sampler", ""),
+                   "fraction": (r.get("fec") or {}).get("fraction", np.nan), "seed": r["seed"]}
+            gens += [{"_order": order, **key, **g} for g in r["generations"]]
+        if not rows:
+            continue
+        d = pd.DataFrame(rows)
+        if d["table_checksum"].nunique() > 1:
+            raise datasets.DatasetError("results", f"runs on two tables for {name}: remove the stale runs")
+        run_frames.append(d)
+        gen_frames.append(pd.DataFrame(gens))
+    if not run_frames:
+        raise datasets.DatasetError("results", f"no runs for {category} under results/ge/ or results/gp/; fetch first")
+    df = pd.concat(run_frames, ignore_index=True).sort_values("_order", kind="stable").drop(columns="_order")
+    store.mkdir(parents=True, exist_ok=True)
+    df.to_csv(store / "runs.csv", index=False)
+    (pd.concat(gen_frames, ignore_index=True).sort_values("_order", kind="stable").drop(columns="_order")
+     .to_csv(store / "generations.csv", index=False))
+    print(f"integrate {category}: {len(df)} runs, {df['dataset'].nunique()} dataset(s), {df['setup'].nunique()} setup(s)")
+    if category == "FEC_Speedup":
+        import phase_timing                                    # phase-timed runs, own table
+        pt = phase_timing.table()
+        if not pt.empty:
+            pt.to_csv(store / "phase_timing.csv", index=False)
+            print(f"integrate: {len(pt)} phase-timed run(s) -> phase_timing.csv")
+        import instrument                                      # instrumented runs, own tables
+        ir, ig = instrument.tables()
+        if not ir.empty:
+            ir.to_csv(store / "instrumented_runs.csv", index=False)
+            ig.to_csv(store / "instrumented_generations.csv", index=False)
+            print(f"integrate: {len(ir)} instrumented run(s) -> instrumented_runs.csv, instrumented_generations.csv")
     return df
 
 
@@ -138,10 +213,26 @@ def spread(b: list[dict], t: list[dict], d: list[dict]) -> dict:
                                       for r in d])}
 
 
-def metrics_table() -> pd.DataFrame:
-    """One row per (setup, dataset, sampler, fraction), from the runs on disk."""
+def metrics_table(category: str = "FEC_Speedup") -> pd.DataFrame:
+    """One row per (setup, dataset, sampler, fraction) of a category, from the runs on disk, one dataset at a time.
+    S_T, dAcc and the tests use every seed with a baseline and a timing run; the fake-hit ratio uses the diagnostic
+    runs present (n_diagnostic of them; all of them once an experiment is complete)."""
+    rows = []
+    for dataset_name in run_datasets(category):
+        rows += _metrics_rows(load_runs(dataset=dataset_name))
+    df = pd.DataFrame(rows)
+    if len(df):                                   # the order of one global pass: (algorithm, setup, dataset)
+        df = df.sort_values(["algorithm", "setup", "dataset"], kind="stable").reset_index(drop=True)
+    store = STORES[category]
+    store.mkdir(parents=True, exist_ok=True)
+    df.to_csv(store / "metrics.csv", index=False)
+    print(f"metrics {category}: {len(df)} configuration(s)")
+    return df
+
+
+def _metrics_rows(runs: list[dict]) -> list[dict]:
     by: dict[tuple, dict[str, list]] = {}
-    for r in load_runs():
+    for r in runs:
         f = r.get("fec") or {}
         key = (r.get("algorithm", "GE"), r["setup"], r["dataset"])
         by.setdefault(key, {}).setdefault((r["mode"], f.get("sampler", ""), f.get("fraction")), []).append(r)
@@ -152,7 +243,7 @@ def metrics_table() -> pd.DataFrame:
             if mode != "fec":
                 continue
             diag = groups.get(("fec_diagnostic", sampler, fraction), [])
-            seeds = {r["seed"] for r in base} & {r["seed"] for r in timing} & {r["seed"] for r in diag}
+            seeds = {r["seed"] for r in base} & {r["seed"] for r in timing}
             pick = lambda runs: sorted((r for r in runs if r["seed"] in seeds), key=lambda r: r["seed"])
             b, t, d = pick(base), pick(timing), pick(diag)
             if not seeds:
@@ -163,7 +254,7 @@ def metrics_table() -> pd.DataFrame:
                                                 np.mean([r["n_train"] for r in b]))
             hits = sum(r["fec"]["hits"] for r in t)
             rows.append({"algorithm": algorithm, "setup": setup, "dataset": name, "sampler": sampler, "fraction": fraction,
-                         "n_runs": m["n_runs"], "S_T": m["S_T"], "dAcc": m["dAcc"], "S_E": m["S_E"],
+                         "n_runs": m["n_runs"], "n_diagnostic": len(d), "S_T": m["S_T"], "dAcc": m["dAcc"], "S_E": m["S_E"],
                          "S_gen": m["S_gen"], "S_wall": m["S_wall"], "hit_rate": m["hit_rate"],
                          "fake_hit_ratio": m["fake_hit_ratio"],
                          "duplicate_hit_share": sum(r["fec"]["same_phenotype_hits"] for r in t) / hits if hits else np.nan,
@@ -174,11 +265,7 @@ def metrics_table() -> pd.DataFrame:
                          "bayes_worse": bayes[0], "bayes_rope": bayes[1], "bayes_better": bayes[2],
                          "baseline_accuracy": float(np.mean(acc_b)), "fec_accuracy": float(np.mean(acc_t)),
                          **spread(b, t, d)})
-    df = pd.DataFrame(rows)
-    STORE.mkdir(parents=True, exist_ok=True)
-    df.to_csv(STORE / "metrics.csv", index=False)
-    print(f"metrics: {len(df)} configuration(s)")
-    return df
+    return rows
 
 
 def difficulty_class(gb: float) -> str:
@@ -187,12 +274,13 @@ def difficulty_class(gb: float) -> str:
     return "hard" if gb < DIFFICULTY_CUTS[0] else ("medium" if gb < DIFFICULTY_CUTS[1] else "simple")
 
 
-def properties_table(full: bool = False) -> pd.DataFrame:
+def properties_table(full: bool = False, category: str = "FEC_Speedup") -> pd.DataFrame:
     """Per recipe: everything shown on the app's dataset page. Incremental: a dataset's row is reused
     when its table, range and grammar are unchanged (split coverage would otherwise read every table,
     the largest ones included); `full=True` recomputes all."""
     corpus = datasets.read_corpus()["datasets"]
-    old_path = STORE / "datasets.csv"
+    store = STORES[category]
+    old_path = store / "datasets.csv"
     old = pd.read_csv(old_path).set_index("dataset") if old_path.is_file() and not full else pd.DataFrame()
     ranges = preprocessing.load_ranges().set_index("name")
     fairness_path = grammar.grammar_dir() / "fairness.csv"
@@ -201,6 +289,8 @@ def properties_table(full: bool = False) -> pd.DataFrame:
     linked = set(pycol.loc[pycol["matches_table"] == "yes", "name"])
     rows = []
     for name in datasets.load_recipes():
+        if not in_category(name, category):
+            continue
         if name not in corpus:                    # recipe written, table not built yet
             print(f"properties: {name} has a recipe but no record yet (python datasets.py recreate {name}); skipped")
             continue
@@ -235,9 +325,9 @@ def properties_table(full: bool = False) -> pd.DataFrame:
         rows.append(row)
     df = pd.DataFrame(rows)
     df["difficulty_class"] = [difficulty_class(v) for v in df["difficulty_gb"]]
-    STORE.mkdir(parents=True, exist_ok=True)
-    df.to_csv(STORE / "datasets.csv", index=False)
-    print(f"properties: {len(df)} dataset(s)")
+    store.mkdir(parents=True, exist_ok=True)
+    df.to_csv(store / "datasets.csv", index=False)
+    print(f"properties {category}: {len(df)} dataset(s)")
     return df
 
 
@@ -245,14 +335,20 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("command", choices=["integrate", "metrics", "properties", "all"])
     p.add_argument("--full", action="store_true", help="properties: recompute every dataset (reads every table)")
+    p.add_argument("--category", default="all", choices=[*STORES, "all"], help="which store to build (default: both)")
     args = p.parse_args(argv)
+    cats = list(STORES) if args.category == "all" else [args.category]
     try:
-        if args.command in ("integrate", "all"):
-            integrate()
-        if args.command in ("metrics", "all"):
-            metrics_table()
-        if args.command in ("properties", "all"):
-            properties_table(full=args.full)
+        for c in cats:
+            if c != "FEC_Speedup" and not run_datasets(c):
+                print(f"{c}: no runs yet, skipped")
+                continue
+            if args.command in ("integrate", "all"):
+                integrate(c)
+            if args.command in ("metrics", "all"):
+                metrics_table(c)
+            if args.command in ("properties", "all"):
+                properties_table(full=args.full, category=c)
         return 0
     except datasets.DatasetError as exc:
         print(f"FAIL {exc}")

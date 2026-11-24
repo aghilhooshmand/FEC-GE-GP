@@ -197,7 +197,7 @@ def check() -> int:
 
 
 def compare_reference(name: str, report: Path = REFERENCE_REPORT) -> bool:
-    """same winner and measurements as the reference implementation's selection report."""
+    """Same winner and measurements as the reference implementation's selection report."""
     rows = {r.get("dataset_file", "")[:-4]: r for r in json.loads(Path(report).read_text())}
     ref = rows.get(name)
     tested = {c["constant_style"].replace("signed_", ""): c for c in (ref or {}).get("combos_tested", [])

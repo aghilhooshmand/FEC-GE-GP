@@ -17,14 +17,15 @@ TINY = {"population": 20, "generations": 2}
 
 def grammar_parts(name):
     text = (grammar.grammar_dir() / f"{name}.bnf").read_text()
-    rule = lambda r: re.search(rf"^{r} ::= (.*)$", text, re.M)
-    feats = lambda r: [int(i) for i in re.findall(r"x\[(\d+)\]", rule(r).group(1))] if rule(r) else []
-    return text, feats("<num_feature>"), feats("<bool_feature>")
+    def feats(kind):                                            # wide lists are split into <kind_0>, <kind_1>, ...
+        bodies = re.findall(rf"^<{kind}(?:_\d+)?> ::= (.*)$", text, re.M)
+        return sorted({int(i) for b in bodies for i in re.findall(r"x\[(\d+)\]", b)})
+    return text, feats("num_feature"), feats("bool_feature")
 
 
 @pytest.mark.parametrize("name", list(ds.load_recipes()))
 def test_primitive_set_equals_grammar(name):
-    """SC-001, for every dataset: reads only the records, no table."""
+    """for every dataset: reads only the records, no table."""
     if not (grammar.grammar_dir() / f"{name}.bnf").is_file():
         pytest.skip(f"{name}: no grammar on this machine (large datasets are recreated on the compute server only)")
     text, numeric, boolean = grammar_parts(name)

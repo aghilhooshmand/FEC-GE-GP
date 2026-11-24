@@ -1,0 +1,19 @@
+% written by paper_tables.py from results/store/metrics.csv; do not edit by hand
+\begin{table}[H]
+\begin{adjustwidth}{-\extralength}{0cm}
+\caption{GE against GP with random fingerprint rows (17 datasets with results for both). Each dataset gives one value per algorithm, the mean over the three fingerprint fractions. GE, GP: median over the datasets. GP $>$ GE: datasets in which GP's value is higher. $p$: paired Wilcoxon signed-rank test over the datasets; a difference is called significant when $p \leq 0.05$. Same per fraction: the test repeated within the 1\%, 5\% and 10\% fractions separately gives the same result.}
+\label{tab:ge-vs-gp}
+\small
+\centering
+\begin{tabular}{llrrrrll}
+\toprule
+Measure & Higher value means & GE & GP & GP $>$ GE & $p$ & Result & Same per fraction \\
+\midrule
+$S_T$ & faster evaluation & $1.31$ & $1.36$ & 8 of 17 & $0.58$ & no significant difference & yes \\
+hit rate & more cache reuse & $0.63$ & $0.47$ & 0 of 17 & $<0.001$ & GE higher & yes \\
+fake-hit ratio & more wrong hits & $0.10$ & $0.38$ & 17 of 17 & $<0.001$ & GP higher & yes \\
+$\Delta$Acc (pp) & less accuracy lost & $-0.03$ & $-0.11$ & 6 of 17 & $0.22$ & no significant difference & yes \\
+\bottomrule
+\end{tabular}
+\end{adjustwidth}
+\end{table}

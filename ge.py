@@ -301,7 +301,12 @@ def evolve(grammar, points_train, points_test, p: dict, seed: int, evaluate=fitn
     `individuals`: a list to fill with individual_rows (the optional individuals file)."""
     toolbox = base.Toolbox()
     toolbox.grammar = grammar
-    toolbox.register("select", tools.selTournament, tournsize=p["tournsize"])
+    rec = getattr(evaluate, "rec", None)                # instrument.Recorder or None (recording only)
+    if rec is not None:
+        import instrument
+        toolbox.register("select", instrument.select_tournament, tournsize=p["tournsize"], rec=rec)
+    else:
+        toolbox.register("select", tools.selTournament, tournsize=p["tournsize"])
     # GRAPE's operators with a retry cap; capped=False: GRAPE's own (no cap), as in runs made before 015
     toolbox.register("mate", crossover_capped if capped else grape.crossover_onepoint)
     toolbox.register("mutate", mutation_capped if capped else grape.mutation_int_flip_per_codon)
@@ -323,12 +328,16 @@ def evolve(grammar, points_train, points_test, p: dict, seed: int, evaluate=fitn
     for gen in range(p["generations"] + 1):
         start = time.time()
         CAP_HITS.update(crossover=0, mutation=0)
+        if rec is not None:
+            rec.begin_generation(gen)
         if gen == 0:
             todo = [ind for ind in population if not ind.fitness.valid]
         else:
             pool = valid if valid else population
             offspring = _var_and(toolbox.select(pool, len(population) - p["elite_size"]), toolbox, p)
             todo = [ind for ind in offspring if not ind.fitness.valid]
+            if rec is not None:
+                rec.unchanged = len(offspring) - len(todo)
         outcome = {}
         for ind in todo:
             ind.fitness.values = evaluate_train(ind)
@@ -347,6 +356,9 @@ def evolve(grammar, points_train, points_test, p: dict, seed: int, evaluate=fitn
                                                  seen, "GE"))
         if hasattr(evaluate, "generation_stats"):      # FEC counters for this generation
             row.update(evaluate.generation_stats())
+        if rec is not None:                            # ins_ columns (and the snapshot at chosen generations)
+            row.update(rec.finish_generation(gen, population, valid, hof.items[0] if len(hof) else None,
+                                             evaluate.cache_bytes()))
         rows.append(row)
         if individuals is not None:
             individuals += individual_rows(gen, population, outcome)
@@ -381,8 +393,16 @@ def phase_setup(overrides: dict | None) -> str:
     return PHASE_SETUP if not overrides else f"{PHASE_SETUP}_{setup_id(overrides)}"
 
 
+INSTRUMENT_SETUP = "instrumented"  # instrumented diagnostic runs, own setup, never over a stored run
+
+
+def instrument_setup(overrides: dict | None) -> str:
+    """Setup of an instrumented run: 'instrumented', or 'instrumented_<hash>' with parameter overrides."""
+    return INSTRUMENT_SETUP if not overrides else f"{INSTRUMENT_SETUP}_{setup_id(overrides)}"
+
+
 def start_run(name: str, seed: int, p: dict, overrides: dict, fec: dict | None, compile_fn,
-              phase_timing: bool = False) -> dict:
+              phase_timing: bool = False, instrument: bool = False) -> dict:
     """The steps every engine shares: checks, split + z-score (option A), FEC sampling and evaluator.
     FEC run k uses the same seed as baseline run k (paired, option 1)."""
     import fec as fec_stage
@@ -396,6 +416,8 @@ def start_run(name: str, seed: int, p: dict, overrides: dict, fec: dict | None, 
     train, test = split(X, y, seed, p["test_size"], True, info)
     if phase_timing and (not fec or fec.get("diagnostic")):
         raise DatasetError(name, "phase timing is for FEC timing runs only (--fraction, no --diagnostic)")
+    if instrument and (not fec or not fec.get("diagnostic") or phase_timing):
+        raise DatasetError(name, "instrument is for FEC diagnostic runs only (--fraction --diagnostic, no phase timing)")
     from measurement import PhaseClock
     clock = PhaseClock() if phase_timing else None
     run = {"record": record, "gpath": gpath, "train": train, "test": test, "start": time.perf_counter(),
@@ -406,8 +428,15 @@ def start_run(name: str, seed: int, p: dict, overrides: dict, fec: dict | None, 
         cache = fec_stage.load_fps_cache(name, seed, record["checksum"], len(train[1]), setup_id(overrides)) \
             if fec.get("fps_cache") and sampler == "farthest_point" else None
         rows_picked, sampling_sec = fec_stage.sample_rows(sampler, train[0], train[1], n, seed, cache)
+        rec = None
+        if instrument:                                  # 019
+            import instrument as instrument_stage
+            rec = instrument_stage.Recorder(p["generations"], np.unique(train[1]))
+            labels, counts = np.unique(np.asarray(train[1])[rows_picked], return_counts=True)
+            rec.fingerprint_class_counts = {str(int(c)): int(k) for c, k in zip(labels, counts)}
         run["evaluate"] = fec_stage.FECEvaluator(train[0][:, rows_picked], bool(fec.get("diagnostic")), compile_fn,
-                                                 phases=clock)
+                                                 phases=clock, instrument=rec)
+        run["rec"] = rec
         run["mode"] = "fec_diagnostic" if fec.get("diagnostic") else "fec"
         run["fec_fields"] = {"sampler": sampler, "fraction": float(fec["fraction"]), "sample_size": n,
                              "sampling_time_sec": sampling_sec, "fps_from_cache": cache is not None,
@@ -417,13 +446,14 @@ def start_run(name: str, seed: int, p: dict, overrides: dict, fec: dict | None, 
 
 def finish_run(algorithm: str, name: str, seed: int, p: dict, overrides: dict, run: dict, rows: list,
                best, n_evals: int, compile_fn) -> dict:
-    """The run record every engine writes (, measurements of 007)."""
+    """The run record every engine writes (of 005, measurements of 007)."""
     if run["mode"] != "baseline":
         run["fec_fields"].update(run["evaluate"].summary())
     best_per_gen = [g.pop("best_phenotype", None) for g in rows]   # own list: not a generations.csv column
     clock = run.get("phases")
     out = {"algorithm": algorithm, "dataset": name, "seed": seed, "mode": run["mode"],
-           "setup": phase_setup(overrides) if clock else setup_id(overrides),
+           "setup": phase_setup(overrides) if clock else instrument_setup(overrides) if run.get("rec") else
+           setup_id(overrides),
             "overrides": overrides, "params": p, "fec": run["fec_fields"],
             "table_checksum": run["record"]["checksum"], "corpus_version": datasets.corpus_version(),
             "grammar_checksum": datasets.sha256_file(run["gpath"]), "code_commit": datasets.git_commit(),
@@ -436,20 +466,24 @@ def finish_run(algorithm: str, name: str, seed: int, p: dict, overrides: dict, r
             "wall_time_sec": time.perf_counter() - run["start"]}
     if clock:
         out["phases"] = clock.as_dict(out["measures"]["eval_time_sec"])
+    if run.get("rec") is not None:                     # per-run fields; logs go beside the run file
+        import instrument
+        out["instrument"] = run["rec"].run_fields(instrument.peak_rss_bytes())
+        out["instrument_logs"] = run["rec"].logs()
     return out
 
 
 def run(name: str, seed: int, params: dict | None = None, fec: dict | None = None,
-        save_individuals: bool = False, phase_timing: bool = False) -> dict:
+        save_individuals: bool = False, phase_timing: bool = False, instrument: bool = False) -> dict:
     """One GE run: baseline, or FEC with fec={"fraction", "sampler", "diagnostic", "fps_cache"}.
     save_individuals: keep every individual of every generation (save_result writes them beside the run)."""
     overrides = dict(params or {})
     p = {**PARAMS, **overrides}
     if p["min_init_depth"] is None:
         p["min_init_depth"] = recorded_depth(name)
-    r = start_run(name, seed, p, overrides, fec, compile_ge, phase_timing)
+    r = start_run(name, seed, p, overrides, fec, compile_ge, phase_timing, instrument)
     capped = True
-    if phase_timing:                    # reproduce the stored twin, made with or without the retry cap
+    if phase_timing or instrument:      # 017/reproduce the stored twin, made with or without the retry cap
         twin = twin_record("GE", name, seed, overrides, fec)
         capped = twin is None or "cap_attempts" in twin
     individuals = [] if save_individuals else None
@@ -470,9 +504,17 @@ def save_result(result: dict) -> Path:
         f"{result['mode']}_{result['fec']['sampler']}_frac{result['fec']['fraction']:g}"
     path = datasets.ROOT / "results" / result["algorithm"].lower() / result["setup"] / result["dataset"] / tag / \
         f"seed{result['seed']}.json"
-    if result["setup"].startswith(PHASE_SETUP) and path.exists():
-        raise DatasetError(result["dataset"], f"{path} exists; phase-timing runs are never overwritten")
+    if result["setup"].startswith((PHASE_SETUP, INSTRUMENT_SETUP)) and path.exists():
+        raise DatasetError(result["dataset"], f"{path} exists; phase-timing and instrumented runs are never overwritten")
     path.parent.mkdir(parents=True, exist_ok=True)
+    logs = result.pop("instrument_logs", None)
+    if logs is not None:                                # event logs beside the run, never in the JSON
+        files = {}
+        for kind, frame in logs.items():
+            lp = path.with_name(f"seed{result['seed']}.{kind}.csv.gz")
+            frame.to_csv(lp, index=False)
+            files[kind] = lp.name
+        result["instrument"]["files"] = files
     individuals = result.pop("individuals", None)
     if individuals is not None:                         # optional: beside the run, never in the JSON
         ipath = path.with_name(f"seed{result['seed']}.individuals.csv.gz")
@@ -587,6 +629,8 @@ def main(argv: list[str] | None = None) -> int:
                    help="also write every individual of every generation (large; small datasets)")
     r.add_argument("--phase-timing", action="store_true",
                    help="time every phase of each evaluation (FEC timing runs only; setup phase_timing)")
+    r.add_argument("--instrument", action="store_true",
+                   help="record the effect of fake hits on the search (FEC diagnostic runs only; setup instrumented)")
     args = p.parse_args(argv)
     try:
         if args.command == "depth":
@@ -602,7 +646,8 @@ def main(argv: list[str] | None = None) -> int:
         overrides = parse_overrides(args.param)
         fec_opts = {"fraction": args.fraction, "diagnostic": args.diagnostic, "sampler": args.sampler,
                     "fps_cache": args.fps_cache} if args.fraction else None
-        result = run(args.name, args.seed, overrides, fec_opts, args.save_individuals, args.phase_timing)
+        result = run(args.name, args.seed, overrides, fec_opts, args.save_individuals, args.phase_timing,
+                     args.instrument)
         path = save_result(result)
         print(f"{args.name} seed {args.seed}: train error {result['best_train_error']:.4f}, "
               f"test error {result['best_test_error']:.4f}, {result['wall_time_sec']:.1f} s -> {path}")
@@ -615,6 +660,13 @@ def main(argv: list[str] | None = None) -> int:
             print(f"twin check: {'ok' if t['ok'] else 'MISMATCH ' + ', '.join(t['mismatches'])} ({t['twin']})")
             if not t["ok"]:
                 print(f"FAIL {args.name} seed {args.seed}: phase-timed run differs from its stored twin")
+                return 1
+        if args.instrument:                             # must reproduce both stored twins
+            import instrument
+            t = instrument.check_twin(path)
+            print(f"twin check: {'ok' if t['ok'] else 'MISMATCH ' + ', '.join(t['mismatches'])} ({t['twins']})")
+            if not t["ok"]:
+                print(f"FAIL {args.name} seed {args.seed}: instrumented run differs from its stored twin")
                 return 1
         return 0
     except DatasetError as exc:

@@ -1,0 +1,12 @@
+# Instrumented diagnostic runs (random rows): selection, memory and per-hit records; each run is checked
+# against its stored timing and diagnostic runs of the same seed (python instrument.py check).
+name: instrumented_ge
+algorithm: GE
+datasets: [wine_quality, phoneme_balanced, dry_bean, bank_marketing, electricity, sleep, Diabetes130US,
+           Run_or_walk_information, accelerometer]
+seeds: 30-59
+fec: {samplers: [random], fractions: [0.01, 0.05, 0.10]}
+modes: [fec_diagnostic]
+instrument: true
+params: {}
+hive: {workers: 80, max_busy: 1.01, all_threads: true}

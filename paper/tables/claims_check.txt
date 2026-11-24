@@ -1,0 +1,287 @@
+ok   GE/fraction-speed: §5 GE: 'Smaller fingerprints gave larger speedups'
+ok   GE/fraction-equivalence: §5 GE: 'Larger fingerprints, in turn, led to more verdicts of practical equivalence'
+ok   GE/size: §5 GE: 'Speed was most strongly associated with the size of the table' (Spearman > 0, p <= 0.05)
+ok   GE/dacc-size: §5 GE: 'the mean dAcc of a dataset showed no significant correlation with its number of rows' (Spearman p > 0.05)
+ok   GE/fake-size: §5 GE: 'The fake-hit ratio fell with size' (Spearman < 0, p <= 0.05)
+ok   GE/fake-1pct-most: §5.3 GE: 'the 1% fingerprint had the most fake hits and the 10% fingerprint the fewest on every table'
+ok   GE/fake-acc-within: §5.3 GE: 'in most datasets the fraction with the most fake hits had the larger accuracy difference' (more than half, Wilcoxon p <= 0.05)
+ok   GE/fake-acc-between: §5.3 GE: 'between datasets, the level of fake hits did not predict the size of the accuracy difference' (p > 0.05)
+ok   GE/overhead-size: §5 GE: 'relative to a full evaluation, the cost of the fingerprint step per candidate fell with size' (Spearman < 0, p <= 0.05)
+ok   GE/overhead-st: §5 GE: 'the lower this relative cost, the larger S_T' (Spearman < 0, p <= 0.05)
+ok   GE/overhead-st-strength: §5.3: the association of S_T with the relative cost is strong in GE (rho = -0.90)
+ok   GE/step-cheapest-accel: §6.5: 'the fingerprint step was cheaper on accelerometer than on any other table' (GE)
+ok   GE/features: §5 GE: 'the number of features was not significantly associated with any of these measures' (all p > 0.05)
+ok   GE/hit-size-flat: §5.1: 'the mean hit rate of a dataset showed no significant correlation with its number of rows'
+ok   GE/threshold: §5 GE: 'Every dataset with at least ... rows ... was significantly faster at all three fractions' (some table from which all are faster exists)
+ok   GE/smallest-not-faster: §5 GE: 'For [names], which have relatively few training instances, ...' (all of them in the smaller half of the tables)
+ok   GP/fraction-speed: §5 GP: 'Smaller fingerprints gave larger speedups'
+ok   GP/fraction-equivalence: §5 GP: 'Larger fingerprints, in turn, led to more verdicts of practical equivalence'
+ok   GP/size: §5 GP: 'Speed was most strongly associated with the size of the table' (Spearman > 0, p <= 0.05)
+ok   GP/dacc-size: §5 GP: 'the mean dAcc of a dataset showed no significant correlation with its number of rows' (Spearman p > 0.05)
+ok   GP/fake-size: §5 GP: 'The fake-hit ratio fell with size' (Spearman < 0, p <= 0.05)
+ok   GP/fake-1pct-most: §5.3 GP: 'the 1% fingerprint had the most fake hits and the 10% fingerprint the fewest on every table'
+ok   GP/fake-acc-within: §5.3 GP: 'in most datasets the fraction with the most fake hits had the larger accuracy difference' (more than half, Wilcoxon p <= 0.05)
+ok   GP/fake-acc-between: §5.3 GP: 'between datasets, the level of fake hits did not predict the size of the accuracy difference' (p > 0.05)
+ok   GP/overhead-size: §5 GP: 'relative to a full evaluation, the cost of the fingerprint step per candidate fell with size' (Spearman < 0, p <= 0.05)
+ok   GP/overhead-st: §5 GP: 'the lower this relative cost, the larger S_T' (Spearman < 0, p <= 0.05)
+ok   GP/overhead-st-strength: §5.3: the association of S_T with the relative cost is moderate in GP (rho = -0.54)
+ok   GP/step-as-full-smallest: §5.3: 'on the two smallest tables the fingerprint step of GP cost about as much as a full evaluation' (mean relative cost >= 0.9)
+ok   GP/features: §5 GP: 'the number of features was not significantly associated with any of these measures' (all p > 0.05)
+ok   GP/hit-size-falls: §5.2: 'the hit rate fell with size'
+ok   GP/true-hit-rises: §5.2: 'The hits lost on larger tables were mostly fake ones: the share of evaluations answered with the correct fitness ... rose with size' (Spearman > 0, p <= 0.05)
+ok   GP/largest-level: §5.2: 'consistent with the levelling of S_T on the two largest tables' (both below the largest mean S_T of the smaller tables)
+ok   GP/threshold: §5 GP: 'Every dataset with at least ... rows ... was significantly faster at all three fractions' (some table from which all are faster exists)
+ok   GP/holm-mid-large-missed: §5 GP: 'Unlike GE, some configurations on mid-sized and large datasets, [configs], were not significantly faster, although FEC was faster on average in each' (some exist, none among the three smallest, all S_T > 1)
+ok   gegp/median-st: §5.2.1: 'its typical speedup was slightly higher' (GP median S_T above GE's at every fraction)
+ok   gegp/max-st: §5.2.1: 'but its largest was lower' (GP max S_T below GE's)
+ok   gegp/size-weaker: §5.2.1: 'the size of the table explained less of the speedup' (GP rho below GE's)
+ok   gegp/comparable-less: §5.2.1: 'GP was comparable in accuracy less often' (overall and at 1%)
+ok   gegp/fake-more: §5.2.1: 'its larger share of fake hits' (GP median fake-hit ratio above GE's)
+ok   GE/fig8-fake-acc: §5.4 GE: 'from 10% to 1% the median fake-hit ratio rose and the median dAcc fell (to below zero)'
+ok   GP/fig8-fake-acc: §5.4 GP: 'from 10% to 1% the median fake-hit ratio rose and the median dAcc fell (to below zero)'
+ok   GE/rope-two-three-quarters: §6.2 GE: 'with up to two points about three quarters of the configurations count as comparable, against under half with one point' (70-80% vs < 50%)
+ok   GP/rope-two-three-quarters: §6.2 GP: 'with up to two points about three quarters of the configurations count as comparable, against under half with one point' (70-80% vs < 50%)
+ok   GE/hits-mostly-different: §5 GE: 'most hits came from a different program than the stored one' (same-program share < 50% at every fraction)
+ok   GE/behavioural-rises-nonequiv-falls: §5 GE: 'from 1% to 10% the share of fitness-equivalent hits rose and that of non-equivalent hits fell'
+ok   GE/behavioural-beats-nonequiv: §5.1: 'fitness-equivalent hits outnumbered non-equivalent ones at every fraction'
+ok   GP/hits-mostly-different: §5 GP: 'most hits came from a different program than the stored one' (same-program share < 50% at every fraction)
+ok   GP/behavioural-rises-nonequiv-falls: §5 GP: 'from 1% to 10% the share of fitness-equivalent hits rose and that of non-equivalent hits fell'
+ok   GP/nonequiv-beats-behavioural-1pct: §5.2: 'at 1% non-equivalent hits outnumbered fitness-equivalent ones, at 5% and 10% the reverse'
+ok   GE/saved-largest: §5 GE: at 1% the largest table (lhc_jets) saved the most time per run, although not with the largest ratio
+ok   GP/small-slower-1pct: §5.2: 'FEC did not speed up GP on the smallest table (wine_quality): each run lost time at 1%'
+ok   GP/saved-largest: §5 GP: at 1% the largest table (lhc_jets) saved the most time per run, although not with the largest ratio
+ok   fake-acc/per-fraction: §5.3: 'within each fraction, the fake-hit ratio of a dataset was not significantly associated with its accuracy difference, except for GP at 1%' (Figure S2)
+ok   fake-acc/gp-stronger: §5.3: 'clearly for GP, more weakly for GE' (GP within-dataset rho >= 0.5 and p <= 0.05; GE rho smaller)
+ok   verdict/undecided-rest: §5.1: 'the remaining <n> GE and <n> GP configurations of 51 were undecided' (no configuration worse or better, so equivalent + undecided = all) and the reply's 'more than half'
+ok   size/GE/never-worse: §6.2 GE: no configuration on any table was judged worse
+ok   size/GE/all-both-mid-sized: §6.2 GE: the tables with both at every fraction are mid-sized (neither among the three smallest nor the largest)
+ok   size/GE/smallest-slower-ten: §6.2 GE: on the three smallest tables FEC was slower at 10% on the named tables
+ok   size/GE/smallest-rarely-all-fast: §6.2 GE: on the three smallest tables FEC was faster at every fraction on at most one
+ok   size/GE/pair-diab-run: §6.2 GE: Diabetes130US both faster and comparable at every fraction, Run_or_walk faster at every fraction but comparable at none
+ok   size/GE/codrna-covertype: §6.2 GE: on codrna and covertype comparable accuracy needed a larger fraction than 1% (none at 1%, some at 5% or 10% on at least one of them)
+ok   size/GE/most-from-threshold-both: §6.2 GE: from the first always-faster table (uncorrected) upwards, most tables had a configuration both faster and comparable
+ok   size/GE/covertype-before-codrna: §6.2 GE: covertype reached comparable accuracy at a smaller fraction than codrna
+ok   size/GE/exceptions-faster: §6.2 GE: the exceptions outside the three smallest tables were faster in some configuration and never worse
+ok   size/GP/never-worse: §6.2 GP: no configuration on any table was judged worse
+ok   size/GP/all-both-mid-sized: §6.2 GP: the tables with both at every fraction are mid-sized (neither among the three smallest nor the largest)
+ok   size/GP/smallest-slower-ten: §6.2 GP: on the three smallest tables FEC was slower at 10% on none (only GE is named)
+ok   size/GP/smallest-rarely-all-fast: §6.2 GP: on the three smallest tables FEC was faster at every fraction on at most one
+ok   size/GP/pair-diab-run: §6.2 GP: Diabetes130US both faster and comparable at every fraction, Run_or_walk faster at every fraction but comparable at none
+ok   size/GP/codrna-covertype: §6.2 GP: on codrna and covertype comparable accuracy needed a larger fraction than 1% (none at 1%, some at 5% or 10% on at least one of them)
+ok   size/GP/most-from-threshold-both: §6.2 GP: from the first always-faster table (uncorrected) upwards, most tables had a configuration both faster and comparable
+ok   size/GP/covertype-before-codrna: §6.2 GP: covertype reached comparable accuracy at a smaller fraction than codrna
+ok   size/GP/exceptions-faster: §6.2 GP: the exceptions outside the three smallest tables were faster in some configuration and never worse
+ok   case/GE/small-slower: §6.2 GE: S_T lower on wine_quality than on covertype
+ok   case/GE/cost: §6.2 GE: a full evaluation costs less on wine_quality than on covertype
+ok   case/GE/fake-rises: §6.2 GE: 'on wine_quality the fake-hit ratio grew over the run'
+ok   case/GE/fake-low: §6.2 GE: 'on covertype it stayed below what wine_quality reached at the end' (max over the run on covertype < last generation on wine_quality)
+ok   difficulty/GE: §6.3 GE: 'S_T showed no significant correlation with difficulty'
+ok   case/GP/small-slower: §6.2 GP: S_T lower on wine_quality than on covertype
+ok   case/GP/cost: §6.2 GP: a full evaluation costs less on wine_quality than on covertype
+ok   case/GP/fake-rises: §6.2 GP: 'on wine_quality the fake-hit ratio grew over the run'
+ok   case/GP/fake-low: §6.2 GP: 'on covertype it stayed below what wine_quality reached at the end' (max over the run on covertype < last generation on wine_quality)
+ok   difficulty/GP: §6.3 GP: 'S_T showed no significant correlation with difficulty'
+ok   case/hit-rises: §6.3: the hit rate rose from generation 1 to 30 on wine_quality and covertype in both algorithms
+ok   case/GP/same-falls: §6.3 GP: the share of structurally equivalent hits fell on wine_quality and covertype
+ok   case/GE/same: §6.2 GE: same-program share of hits fell on wine_quality and rose on covertype
+ok   gegp/difficulty-differs: §6.3: electricity_cat is easier than Diabetes130US (GB balanced accuracy)
+ok   gegp/electricity_cat/gp-faster: §6.3: GP faster than GE on electricity_cat
+ok   gegp/electricity_cat/gp-grows: §6.3: GP programs more than doubled in size on electricity_cat; GE stayed below 15 nodes
+ok   gegp/electricity_cat/diversity: §6.3: GP fitness diversity fell and GE's rose on electricity_cat
+ok   gegp/electricity_cat/gp-hits-rise: §6.3: GP hit rate rose over the run on electricity_cat
+ok   gegp/electricity_cat/work: §6.3: at the last generation GP's hits avoided a larger share of the work than GE's on electricity_cat
+ok   gegp/electricity_cat/not-same: §6.3: on electricity_cat most GP hits late in the run came from different programs (same < 25%)
+ok   gegp/Diabetes130US/gp-faster: §6.3: GP faster than GE on Diabetes130US
+ok   gegp/Diabetes130US/gp-grows: §6.3: GP programs more than doubled in size on Diabetes130US; GE stayed below 15 nodes
+ok   gegp/Diabetes130US/diversity: §6.3: GP fitness diversity fell and GE's rose on Diabetes130US
+ok   gegp/Diabetes130US/gp-hits-rise: §6.3: GP hit rate rose over the run on Diabetes130US
+ok   gegp/Diabetes130US/work: §6.3: at the last generation GP's hits avoided a larger share of the work than GE's on Diabetes130US
+ok   gegp/Diabetes130US/not-same: §6.3: on Diabetes130US most GP hits late in the run came from different programs (same < 25%)
+ok   case/GP/small-below-one: §6.2: on wine_quality GP with FEC was slower than the baseline (S_T < 1)
+ok   gegp/similar-margin: §6.3: 'GP was faster than GE by a similar margin on both' (GP/GE S_T ratios within 0.15 of each other)
+ok   gegp/electricity_cat/ge-small-hits: §6.3: on electricity_cat GE hits avoided less work than their number suggests (work share < hit rate in the last generation: hit programs smaller than missed ones)
+ok   gegp/Diabetes130US/ge-small-hits: §6.3: on Diabetes130US GE hits avoided less work than their number suggests (work share < hit rate in the last generation: hit programs smaller than missed ones)
+ok   gegp/cover-diverse: §6.3: covertype GP kept a higher fitness diversity than both case datasets
+ok   mc/classes: §6.5: accelerometer is multiclass, covertype binary
+ok   mc/rows: §6.5: covertype has more than three times the rows of accelerometer
+ok   mc/faster: §6.5: S_T higher on accelerometer than on covertype at every fraction
+ok   mc/same-cost: §6.5: a full baseline evaluation costs about the same on both (within 15%)
+ok   mc/same-base-time: §6.5: baseline evaluation time per run about the same on both (within 15%)
+ok   mc/fec-time: §6.5: with FEC at 5% the evaluation time per run is lower on accelerometer than on covertype
+ok   mc/larger: §6.5: programs on accelerometer are more than three times as large as on covertype in the last generation
+ok   mc/grow: §6.5: programs on accelerometer nearly doubled in size over the run (> 1.8x), those on covertype stayed at about five nodes (3-6 in every generation)
+ok   mc/similar-hits: §6.5: similar hit rates at 5% (within 0.1)
+ok   mc/hit-size: §6.5: relative to a missed program, a hit program was more than twice as large on accelerometer as on covertype
+ok   mc/work: §6.5: hits avoided a larger share of the work on accelerometer
+ok   mc/not-same: §6.5: few hits on accelerometer were the same program (< 10%), most on covertype (> 50%)
+ok   mc/few-fakes: §6.5: fake hits rare on both (< 5% of the hits)
+ok   mc/nearly-twice: §6.5: S_T on accelerometer nearly twice that on covertype at every fraction (1.6-2.1x)
+ok   mc/work-words: §6.5: hits avoided about two thirds of the work on accelerometer (0.6-0.75) and less than half on covertype
+ok   mc/size-words: §6.5: a hit program was nearly as large as a missed one on accelerometer (> 0.7) and about a third of it on covertype (0.25-0.4)
+ok   mc/weak-baseline: §6.5: GE's baseline accuracy on accelerometer well below gradient boosting (> 0.1 lower)
+ok   mc/lhc-largest: §6.5: lhc_jets is the largest table of the corpus
+ok   mc/lhc-multiclass: §6.5: lhc_jets and sleep have more than two classes
+ok   mc/lhc-slower: §6.5: S_T lower on lhc_jets than on accelerometer at every fraction
+ok   mc/lhc-fewer-hits: §6.5: hit rate on lhc_jets lower than on accelerometer at 5% (by > 0.1)
+ok   mc/lhc-full-size: §6.5: on lhc_jets hits were of the same kind: a hit program > 80% of a missed one, < 10% same program
+ok   mc/lhc-no-equiv: §6.5: no equivalence on lhc_jets at any fraction, and none worse
+ok   mc/lhc-loose: §6.5: on lhc_jets the paired accuracy difference varied by more than two points at every fraction
+ok   mc/lhc-long: §6.5: an FEC run on lhc_jets still spent more than half the baseline's evaluation time
+ok   mc/lhc-fraction: §6.5: on lhc_jets S_T fell as the fraction (and the fingerprint) grew
+ok   mc/sleep-equiv: §6.5: sleep reached equivalence at 5% and 10%
+ok   pool/equal: Figs 10, 11, 13: the three fractions contribute nearly equal numbers of evaluations (largest / smallest < 1.25 in the last generation)
+ok   pool/fig10: Fig 10: fake-hit ratio higher on wine_quality than on covertype at every fraction, GE and GP
+ok   pool/fig11: Fig 11: hit/miss program size larger on accelerometer than on covertype at every fraction
+ok   pool/fig13: Fig 13: GP programs larger and GP's hits avoiding more work than GE's at every fraction
+ok   sizepair/sleep-electricity: §6.6: sleep vs electricity (GE, 1%): similar size (within 1.5x) and hit rate (within 0.05), larger hit/miss size ratio, more work avoided and higher S_T for the first
+ok   sizepair/dry_bean-phoneme_balanced: §6.6: dry_bean vs phoneme_balanced (GE, 5%): similar size (within 1.5x) and hit rate (within 0.05), larger hit/miss size ratio, more work avoided and higher S_T for the first
+ok   sizepair/gp-elec: §6.6 GP: electricity and electricity_cat at 5%: same rows, hit rates within 0.05, larger size ratio and more work avoided on electricity, yet the smaller S_T
+ok   sizepair/gp-small: §6.6 GP: wine_quality has the larger size ratio than dry_bean at 5% but S_T at or below one and below that of the other
+ok   sizepair/gp-weak: §6.6 GP: between similar GP tables S_T follows the size ratio in no more than about half of the pairs
+ok   sizepair/binary-weak: §6.6: between similar binary GE tables the size ratio differs little (< 0.15) and S_T follows it in no more than about two thirds of the pairs
+ok   sizefig/ge-sleep-flat: Fig size pairs: on sleep (GE 1%) hit and missed programs are about the same size throughout (ratio 0.9-1.0 in every generation)
+ok   sizefig/ge-elec-half: Fig size pairs: on electricity (GE 1%) hits are about half the size of misses throughout (ratio < 0.6 in every generation) and the missed programs grow over the run
+ok   sizefig/gp-crosses: Fig size pairs: with GP (5%) the ratio starts below one and ends above one on both tables, higher on electricity
+ok   sizefig/ge-work: Fig size pairs: in the last generation the share of work avoided is close to the hit rate on sleep (within 0.05) and well below it on electricity (more than 0.15 lower)
+ok   rope/GE/no-worse-better: §5 GE: at none of +-1/2/3 pp was a configuration worse or better
+ok   rope/GE/only-undecided-to-equivalent: §5 GE: a wider ROPE only moved configurations from undecided to equivalent
+ok   rope/GP/no-worse-better: §5 GP: at none of +-1/2/3 pp was a configuration worse or better
+ok   rope/GP/only-undecided-to-equivalent: §5 GP: a wider ROPE only moved configurations from undecided to equivalent
+ok   rho/fewer-equivalent: §5: a larger rho gives fewer equivalent configurations (never more)
+ok   rho/none-worse-from-0.2: §5: no configuration judged worse at any rho from 0.2 to 0.5
+ok   rho/zero-worse-small-one: §5: the configurations worse at rho = 0 are undecided at rho = 0.2 and use a 1% fingerprint on the smallest tables
+ok   size/fake-not-rows: §5.5: at the same fingerprint size, the table size had no detectable effect on the fake-hit ratio (95% interval of b_rows contains 0, GE and GP)
+ok   size/fake-fp: §5.5: a larger fingerprint gave fewer fake hits and smaller errors per fake hit (interval of b_fp below 0, GE and GP)
+ok   size/err-near-inverse: §5.5: the error per fake hit fell about in proportion to the fingerprint size (b_fp between -1.1 and -0.8, GE and GP)
+ok   size/st-rows: §5.1/5.2: at the same fingerprint size a larger table gave a larger S_T, also with the share of work avoided in the model (interval of b_rows above 0, GE and GP)
+ok   size/st-fp: §5.1/5.2: at the same table size a larger fingerprint gave a smaller S_T (GE and GP)
+ok   size/within: §4.4: b_fp equals the within-table slope (the same three fractions on every table; fingerprint rounding aside)
+ok   size/overlap: §4.4: every table shares fingerprint sizes with a table at least three times larger or smaller
+ok   size/err-rows: §5.5: at the same fingerprint size, a larger table gave smaller errors per fake hit in GP (interval below 0) but not in GE (interval contains 0)
+ok   size/fp-stable: §6.2: the fingerprint-size effects changed little when one dataset was left out (leave-one-out range inside the bootstrap interval, every measure)
+ok   size/rows-wider: §6.2: the intervals of the table-size effects were wider than those of the fingerprint-size effects (S_T, hit rate, fake-hit ratio, error per fake hit; GE and GP)
+ok   size/acc-fp: §5.5: a larger fingerprint on the same table gave a smaller |Delta Acc| (interval below 0) and no effect of table size at the same fingerprint size was detected (interval contains 0), GE and GP
+ok   size/large-one-thousands: §6.1: on the largest tables a 1% fingerprint has thousands of rows (three largest, >= 1,000)
+ok   guide/small-often-not-faster: §6.1: on the smallest datasets FEC was often not faster (at least half of their configurations not significantly faster)
+ok   guide/one-pct-usually-fastest: §6.1: on the datasets where 1% reaches the threshold, 1% had the highest mean S_T of the three fractions usually (all but at most one dataset per algorithm)
+ok   guide/many-rows: §6.1: with at least 350 fingerprint rows, the worst fake hit exceeded 1 pp in at most 2% of generations (every configuration, both algorithms)
+ok   guide/few-rows: §6.1: with fewer than 150 fingerprint rows, the worst fake hit exceeded 1 pp in more than half of the generations (every configuration)
+ok   guide/bands-by-size: §6.1: the fraction needed to reach the row threshold falls as datasets grow (1% for the largest, 5% for mid-sized, none for the smallest)
+ok   guide/no-ten-pct-band: §6.1: no dataset needs 10% to reach the row threshold (the bands are 1%, 5%, none)
+ok   guide/small-are-smallest3: §6.1: the datasets that do not reach the threshold even at 10% are the three smallest (the ones §6.2 discusses)
+ok   cost/rule: §6.2: the rule w > c gave the observed side of S_T = 1 in all but at most one configuration per algorithm
+ok   cost/rank: §6.2: predicted and measured S_T rank the configurations alike (Spearman >= 0.85, both)
+ok   cost/err-small: §6.2: the typical (median absolute) prediction error is at most 15% (both)
+ok   cost/gp-over: §6.2: in GP the model tends to overestimate S_T (median signed error > 0)
+ok   cost/wine-example: §6.2: GP wine_quality 1%: most work avoided (w > 0.8) but the fingerprint costs a full evaluation or more (c >= 1) and FEC was slower
+ok   cost/pilot-ge: §6.2: in GE a 5-generation pilot gave the right decision as often as the whole run
+ok   cost/pilot-gp-cautious: §6.2: in GP a 5-generation pilot was wrong more often, and all but at most one of its mistakes rejected FEC where it was faster
+ok   cost/pilot-gp-longer: §6.2: in GP a 10-generation pilot was right more often than a 5-generation one
+ok   cost/pilot-ge-early-gp-late: §6.2 / Figure S5: GE came within one decision of the whole run after at most 5 generations, GP only after at least 15
+ok   mem/all-runs: §5.3: every paper dataset x algorithm x fraction has its 30 seeds
+ok   mem/entries-below-evals: §5.3: no cache held more entries than its run had evaluations
+ok   mem/entries-gp-more: §5.3: GP stored more entries than GE (medians)
+ok   mem/largest-gp-multi: §5.3: the largest cache was a GP run on a multiclass dataset
+ok   mem/text-most: §5.3: in every run most of the cache space held the program text (fitness-only < half)
+ok   mem/share-small: §5.3: the cache was at most 10% of the peak memory of any run (GE at most 5%)
+ok   mem/recent-gp-more: §5.3: keeping only the last 10 generations keeps more of the hits in GP than in GE
+ok   mem/recent-most: §5.3: keeping only the last 10 generations keeps most (> 50%) of the hits in both
+ok   sel/all-runs: §5.5: every configuration has its 30 seeds
+ok   sel/elite-never: §5.5: the best program of a generation never carried a wrong fitness
+ok   sel/rank-high: §5.5: at 5% and 10% the median rank correlation of used and true fitness is at least 0.99 in both algorithms
+ok   sel/gp-more: §5.5: GP had more tournaments with a truly worse winner than GE at every fraction
+ok   sel/falls-fraction: §5.5: the median share of changed tournaments falls from 1% to 5% to 10% (both)
+ok   sel/falls-rows: §5.5: the share of changed tournaments falls with the fingerprint rows (rho <= -0.7, p < 0.001)
+ok   sel/gap-small: §5.5: at 5% and 10% a truly worse winner was worse by a median of less than 0.1 pp (both)
+ok   sel/top-smallest: §5.5: the configuration with the most changed tournaments has a fingerprint below 100 rows (both)
+ok   sel/grows: §5.5 / Figure fig:selection: changed tournaments were more frequent in the last five generations than in the first five, for every algorithm and fraction
+ok   div/all-runs: §5.5: every configuration has 30 paired runs
+ok   div/after-fake: §5.5: no FEC run separated from its baseline before its first fake hit
+ok   div/most: §5.5: most FEC runs separated from their baseline (> 80% in every configuration group)
+ok   div/early: §5.5: separation came early (median generation <= 6 in every algorithm and fraction)
+ok   div/abs-at-ten: §5.5: at 10% the best training errors still differed by at least 0.5 pp on average
+ok   div/no-drift-rest: §5.5: at 5% and 10% the mean signed difference of best training error at the end is within 0.1 pp (both)
+ok   div/gp1-grows: §5.5 / Figure fig:divergence: in GP at 1% the mean signed difference grows from generation 5 to 10 to 20 to 30
+ok   div/gp1-worse: §5.5: GP at 1% ended significantly worse in training and test error (Wilcoxon p < 0.001)
+ok   div/test-rest-ns: §5.5: at 5% and 10% the test error of FEC and baseline did not differ significantly (Wilcoxon p >= 0.05, both algorithms)
+ok   div/ge1-smaller: §5.5: GE at 1% ended worse than its baseline, but by less than GP at 1%
+ok   exact/below-fec: §5.3: the shadow exact cache hit less often than FEC in every configuration
+ok   exact/more-entries: §5.3: an exact cache would store more entries than FEC in every configuration
+ok   exact/all-runs: §5.3: every configuration has its 30 instrumented runs
+ok   gegp-eq/mid-gp-faster: §6.7: where both kept their accuracy, GP was faster on every mid-sized table, its hits skipping programs larger than its misses (ratio > 1) while GE's were less than half the size of a miss
+ok   gegp-eq/large-ge-faster: §6.7: where both kept their accuracy on the large tables, GE was faster in every configuration and GP hit the cache less often
+ok   gegp-eq/work-orders-speed: §6.7: in every configuration where both kept their accuracy, the algorithm whose hits avoided more work had the larger S_T
+ok   gegp/no-overfit: §6.6.1: 'neither algorithm overfitted on these two tables' (train-test gap of the best program in the last baseline generation below one percentage point)
+ok   work/ge-binary-small: §6.5: on every binary table a GE hit program was less than half the size of a missed one
+ok   work/ge-multi-large: §6.5: on every multiclass table a GE hit program was more than 70% of a missed one
+ok   work/rho: §6.5: from the GE threshold up, S_T follows work avoided (significant) more closely than hit rate
+ok   work/examples-top: §6.2: ('credit', 'california') have the two highest GE hit rates of the binary tables at 5%
+ok   work/examples-slow: §6.2: at 5% their hit rate is higher but their S_T lower than on sleep and lhc_jets
+ok   work/examples-half: §6.2: on ('credit', 'california') the hits avoided only about half of the evaluation work at 5% (40-60%)
+ok   work/small-overhead: §6.5: on ('wine_quality', 'phoneme_balanced') the hits avoided at least 40% of the work at 5% but S_T stayed at about 1 (0.95-1.05)
+ok   work/gp-large: §6.5: GP hit programs at least about as large as missed ones on most configurations (ratio > 1 in more than half, min > 0.85)
+ok   concl/GE/one-percent-most-faster: Conclusions: with a 1% fingerprint GE was significantly faster on [n] of the datasets (more than half)
+ok   concl/GE/smallest-never-equivalent: Conclusions GE: on the smallest tables no fraction gave accuracy confirmed as equivalent
+ok   concl/GE/smallest-fast-at-one: Conclusions GE: on the smallest tables 1% was enough for a speedup on some, and larger fractions were faster on no more of them
+ok   concl/GE/smallest-lose-speed: Conclusions GE: on the smallest tables a larger fraction lowered the median S_T
+ok   concl/GE/largest-needs-fraction: Conclusions GE: on the largest tables no 1% configuration was equivalent, more were at 10%
+ok   concl/GE/largest-speed-cost: Conclusions GE: on the largest tables the larger fraction lowered the speedup
+ok   concl/GP/one-percent-most-faster: Conclusions: with a 1% fingerprint GP was significantly faster on [n] of the datasets (more than half)
+ok   concl/GP/smallest-never-equivalent: Conclusions GP: on the smallest tables no fraction gave accuracy confirmed as equivalent
+ok   concl/GP/smallest-fast-at-one: Conclusions GP: on the smallest tables 1% was enough for a speedup on some, and larger fractions were faster on no more of them
+ok   concl/GP/smallest-lose-speed: Conclusions GP: on the smallest tables a larger fraction lowered the median S_T
+ok   concl/GP/largest-needs-fraction: Conclusions GP: on the largest tables no 1% configuration was equivalent, more were at 10%
+ok   concl/GP/largest-speed-cost: Conclusions GP: on the largest tables the larger fraction lowered the speedup
+ok   rep/gp-few-repeats: §6 (point 2): a structural cache would hit on 2-14% of GP's evaluations (< 15% on every dataset)
+ok   rep/ge-binary-more: §6 (point 2): GE repeats programs more on binary than on multiclass tables
+ok   rep/ge-binary-much: §5.4: in GE on binary tables exact repeats alone accounted for much of the hit rate (median structural-cache rate >= half of the median FEC hit rate at every fraction)
+ok   rep/structural-fewer: §6 (point 2): 'far fewer than FEC's hits' (structural cache hit rate below FEC's hit rate on every dataset and fraction)
+ok   kinds/multi-behavioural: §5 (points 2, 4): on multiclass tables most hits were fitness-equivalent, more than on binary tables, with fewer structural and fake hits (both algorithms, medians at 5%)
+ok   kinds/fake-falls-rows: §5 (points 2, 4): the share of fake hits fell with the number of rows in both algorithms (Spearman < 0, p <= 0.05)
+ok   kinds/gp-behavioural-rises-rows: §5 (points 2, 4): in GP the behavioural share rose with rows (p <= 0.05)
+ok   kinds/structural-little-change: §5 (points 2, 4): 'the share of structurally equivalent hits changed little' with the fraction (pooled, 1% vs 10%: within 6 points)
+ok   kinds/beh-eval-multi: §5.4: fitness-equivalent hits replaced more full evaluations on multiclass than on binary tables (both algorithms, every fraction; medians)
+ok   kinds/ge-multi-larger: §5.4: in GE, multiclass programs were several times larger than binary ones (median operator calls, baseline runs, at least 3x)
+ok   kinds/structural-not-rows: §5 (points 2, 4): the structural share was not associated with rows (p > 0.05)
+ok   sev/GE/falls-rows: §5.5 GE: error per fake hit fell with rows (rho < 0, p <= 0.05)
+ok   sev/GE/falls-fraction: §5.5 GE: on every table the error per fake hit fell from 1% to 5% to 10%
+ok   sev/GP/falls-rows: §5.5 GP: error per fake hit fell with rows (rho < 0, p <= 0.05)
+ok   sev/GP/falls-fraction: §5.5 GP: on every table the error per fake hit fell from 1% to 5% to 10%
+ok   sev/abstract-small: Abstract: at 5% and 10% a fake hit changed fitness by at most 0.15 pp on average (both algorithms)
+ok   sev/large-only-small-1pct: §5.5: errors above 5 pp were common only at 1% on the three smallest tables (>= 75% of their generations) and rare elsewhere (<= 2% of generations, never above 7 pp)
+ok   sev/small-never-equivalent: §5.5: the three smallest tables were never confirmed equivalent in accuracy, at any fraction, in either algorithm
+ok   abstract/fp-share-size: Abstract: 'fingerprint computation accounted for a smaller proportion of total evaluation time' on larger datasets (Spearman of the fingerprint share of FEC evaluation time with rows < 0, p <= 0.05, both algorithms)
+ok   abstract/speedup-size: Abstract: 'speedup grew with dataset size' (Spearman of mean S_T with rows > 0, p <= 0.05, both algorithms)
+ok   rope/relative-more: §5: '+-1 pp is conservative: with a ROPE relative to the baseline's error more configurations are equivalent' (GE and GP each: >= as many equivalent at 10 % relative as at +-1 pp, and no configuration moves from equivalent to undecided at 10 %)
+ok   rope/relative-all: §5: the relative-ROPE ranges (5 % to 20 % of the error) are reported as 'from x% to y%' next to +-1 pp; each relative ROPE gives more equivalent configurations than +-1 pp (GE and GP each), so the 5 % and 20 % values are the ends of the range
+ok   size/partial: §5: 'the association with size persisted when the hit rate, the share of work avoided, the hit/miss program size or the number of classes was held constant' (all partial rho > 0, p <= 0.05)
+ok   size/work-ge: §5: 'for GE, the share of work avoided added to it' (partial rho > 0, p <= 0.05; GP: p > 0.05)
+ok   wall/smaller: §5 intro: 'the gain in whole-run wall time is smaller than in evaluation time, most of all for GE' (median S_wall below median S_T for both; larger gap for GE)
+ok   frac-tradeoff/GE/more-hits: §6.1 GE: a smaller fingerprint gave more hits (median hit rate higher at 1% than at 10%, paired p <= 0.05)
+ok   frac-tradeoff/GE/more-speed: §6.1 GE: and a larger speedup (paired p <= 0.05)
+ok   frac-tradeoff/GE/more-fakes-everywhere: §6.1 GE: the fake-hit ratio was higher at 1% than at 10% on every dataset
+ok   frac-tradeoff/GE/accuracy-other-way: §6.1 GE: the median accuracy difference was higher (better) at 10% than at 1%
+ok   frac-tradeoff/GP/more-hits: §6.1 GP: a smaller fingerprint gave more hits (median hit rate higher at 1% than at 10%, paired p <= 0.05)
+ok   frac-tradeoff/GP/more-speed: §6.1 GP: and a larger speedup (paired p <= 0.05)
+ok   frac-tradeoff/GP/more-fakes-everywhere: §6.1 GP: the fake-hit ratio was higher at 1% than at 10% on every dataset
+ok   frac-tradeoff/GP/accuracy-other-way: §6.1 GP: the median accuracy difference was higher (better) at 10% than at 1%
+ok   frac-tradeoff/gp-accuracy: §6.1: 'the accuracy shift was significant in GP but small and not significant in GE' (paired p)
+ok   frac-tradeoff/gp-more-fakes: §6.1: 'GP's 1% configurations had far more fake hits than GE's' (median fake-hit ratio at 1% at least twice GE's)
+ok   pair/Codrna-Cover/faster-more-hits: §6.3: covertype faster than codrna at 1% and 5%, with a higher hit rate
+ok   pair/Codrna-Cover/simpler-population: §6.3: covertype evolved shorter programs, fewer unique phenotypes and fewer features than codrna (1% and 5%)
+ok   pair/Codrna-Cover/more-repeats: §6.3: more hits were the same program on covertype than on codrna
+ok   pair/Diab-Run/faster-more-hits: §6.3: Run_or_walk_information faster than Diabetes130US at 1% and 5%, with a higher hit rate
+ok   pair/Diab-Run/simpler-population: §6.3: Run_or_walk_information evolved shorter programs, fewer unique phenotypes and fewer features than Diabetes130US (1% and 5%)
+ok   pair/Diab-Run/more-repeats: §6.3: more hits were the same program on Run_or_walk_information than on Diabetes130US
+ok   pair/codrna-covertype/not-fake-hits: §6.3: fake hits do not explain codrna's undecided verdicts (low on both, higher on covertype at 1% and 5%)
+ok   pair/codrna-covertype/paired-course: §6.3: at 5% the paired sd of dAcc was below 0.5 pp on covertype and about 1 pp or more on codrna, although covertype's baseline varies more between seeds
+ok   pair/codrna-covertype/verdicts: §6.3: covertype comparable at 5%, codrna not
+ok   pair/diab-run/more-fakes: §6.3: Run_or_walk had more fake hits than Diabetes130US at 1% and 5%
+ok   pair/diab-run/fec-changes-population: §6.3: at 1% FEC lowered the unique phenotypes of Run_or_walk below its baseline, while on Diabetes130US they stayed within 1% of the baseline
+ok   pair/diab-run/paired-course: §6.3: the paired sd of dAcc was about 0.1 pp on Diabetes130US and above 2.5 pp on Run_or_walk at 1% and 5%
+ok   gegp/same-speed: §6.6: GE and GP gained the same speed (paired S_T difference not significant)
+ok   gegp/fewer-hits: §6.6: GP had fewer hits (lower in most pairs, p <= 0.05)
+ok   gegp/more-fakes: §6.6: GP's cache was wrong more often (fake-hit ratio higher, p <= 0.05)
+ok   gegp/accuracy-cost: §6.6: GP's accuracy difference was lower (worse) on most datasets
+ok   gegp/accuracy-ns: §6.6: 'but the difference was not significant', over the datasets and within every fraction
+ok   gegp/fewer-both: §6.6: fewer GP configurations were both faster and comparable on the shared datasets

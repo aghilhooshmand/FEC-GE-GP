@@ -129,3 +129,26 @@ def test_failed_picks_do_not_block(tmp_path):
 def test_gp_jobs_run_typed_gp():
     job = batch.plan({**exp_for(["prnn_crabs"], (30,)), "algorithm": "GP"})[1]
     assert job.command()[1] == "typed_gp.py" and job.out.parts[-5] == "gp"
+
+
+def test_free_cores_all_threads(monkeypatch):
+    # cores (0,40) and (1,41) idle, (2,42) busy on one thread
+    monkeypatch.setattr(batch, "physical_cores", lambda: [[0, 40], [1, 41], [2, 42]])
+    ticks = iter([{c: (0, 0) for c in (0, 1, 2, 40, 41, 42)},
+                  {**{c: (100, 99) for c in (0, 1, 2, 40, 41)}, 42: (100, 10)}])
+    monkeypatch.setattr(batch, "_cpu_times", lambda: next(ticks))
+    monkeypatch.setattr(batch.time, "sleep", lambda s: None)
+    assert batch.free_cores(interval=0) == [0, 1]
+    ticks = iter([{c: (0, 0) for c in (0, 1, 2, 40, 41, 42)},
+                  {**{c: (100, 99) for c in (0, 1, 2, 40, 41)}, 42: (100, 10)}])
+    assert batch.free_cores(interval=0, all_threads=True) == [0, 1, 40, 41]
+    ticks = iter([{c: (0, 0) for c in (0, 1, 2, 40, 41, 42)},
+                  {**{c: (100, 99) for c in (0, 1, 2, 40, 41)}, 42: (100, 10)}])
+    assert batch.free_cores(3, interval=0, all_threads=True) == [0, 1, 40]
+
+
+def test_all_threads_refused_with_timing_jobs(capsys, monkeypatch):
+    monkeypatch.setattr(experiment, "load", lambda p: {**exp_for(["a"], (30, 31)),
+                                                       "hive": {"workers": None, "max_busy": 0.1, "all_threads": True}})
+    assert batch.main(["pilot", "x.yaml"]) == 1
+    assert "all_threads" in capsys.readouterr().out
