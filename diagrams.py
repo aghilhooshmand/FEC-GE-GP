@@ -69,7 +69,7 @@ def fec_workflow(out_dir: Path) -> Path:
     ax.text(2.6, 13.4, "once per run", fontsize=fs.BASE_SIZE - 1, color=fs.INK_SECONDARY, style="italic",
             va="center")
     _box(ax, 12.5, 7, W, H, "training rows ($N$);\ntest rows unused")
-    _box(ax, 36, 7, W, H, "$m=\\rho N$ fingerprint\nrows, at random")
+    _box(ax, 36, 7, W, H, "$m=\\mathrm{round}(\\varphi N)$\nrows, at random")
     _arrow(ax, [(22, 7), (26.5, 7)])
 
     # per candidate (middle row)

@@ -1,13 +1,13 @@
 % written by paper_tables.py from results/store/metrics.csv; do not edit by hand
 \begin{table}[H]
 \begin{adjustwidth}{-\extralength}{0cm}
-\caption{Summary per algorithm and fingerprint fraction $\rho$ (random fingerprint rows) over the datasets with results ($n$). $S_T$ and $\Delta$Acc: median [interquartile range] over the $n$ datasets of the per-dataset values ($\Delta$Acc in percentage points). Faster/slower: datasets with a significant difference in evaluation time (paired Wilcoxon, \rev{Holm-adjusted} $p \leq 0.05$ \rev{over the algorithm's 51 configurations}), out of $n$. Verdicts: number of the $n$ datasets judged equivalent / undecided by the Bayesian correlated $t$-test (probability $\geq 0.95$). No configuration was judged worse or better.}
+\caption{Summary per algorithm and fingerprint fraction $\varphi$ over the $n$ datasets. $S_T$ and $\Delta$Acc (percentage points): median [interquartile range] across datasets. Faster/slower: datasets with a significant difference in evaluation time (Wilcoxon, Holm-adjusted $p \leq 0.05$). Equivalent/undecided: verdicts of the Bayesian correlated $t$-test (probability $\geq 0.95$); no configuration was judged worse or better.}
 \label{tab:summary}
 \small
 \centering
 \begin{tabular}{rrlrll}
 \toprule
-$\rho$ & $n$ & Median $S_T$ & Faster/slower & Median $\Delta$Acc & Equivalent/undecided \\
+$\varphi$ & $n$ & Median $S_T$ & Faster/slower & Median $\Delta$Acc & Equivalent/undecided \\
 \midrule
 \multicolumn{6}{l}{\textbf{GE}} \\
 0.01 & 17 & 1.49 [1.36, 1.73] & 16/0 & -0.08 [-0.32, +0.03] & 5/12 \\

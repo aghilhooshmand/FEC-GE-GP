@@ -14,6 +14,7 @@ evolution (GE, with GRAPE) and strongly typed genetic programming (GP, with DEAP
 |---|---|
 | v1.0.0 | as submitted |
 | v1.1.0 | revised: adds the instrumented runs (cache memory, selection, divergence from the baseline, exact-match cache), the code of every table and figure (`paper_tables.py`, `diagrams.py`, `figstyle.py`) with the published outputs in `paper/`, and `example.py` |
+| v1.2.0 | revised, final: the same runs and results as v1.1.0; figures drawn at the paper's print width with panel letters, the cost-model figure in the main text, the case studies as Supplementary File S2, and `paper_tables.py --figures` |
 
 ## Checking the work in four steps
 
@@ -86,12 +87,12 @@ is attached to the release:
 
 ```bash
 curl -L -o results/store/generations.csv.gz \
-  https://github.com/aghilhooshmand/FEC-GE-GP/releases/download/v1.1.0/generations.csv.gz
+  https://github.com/aghilhooshmand/FEC-GE-GP/releases/download/v1.2.0/generations.csv.gz
 python paper_tables.py --check        # rebuild in a temporary folder and compare with paper/
 ```
 
 It ends with `check: 54 of 54 files identical`: the tables, figures, Supplementary Tables S1-S20 and
-Figures S2-S5 rebuilt from the store are the ones in the paper. To look at the rebuilt files instead:
+Figures S2-S4 rebuilt from the store are the ones in the paper. To look at the rebuilt files instead:
 
 ```bash
 python paper_tables.py --out rebuilt  # writes rebuilt/tables and rebuilt/supplementary
@@ -103,6 +104,21 @@ Besides the tables and figures, the build writes two files that make the text ch
   these macros, so no result is typed by hand);
 - `paper/tables/claims_check.txt`: every statement of the text about the data (for example "the fake-hit ratio
   fell with size"), with the test behind it and its result, OK or FAIL.
+
+**Checking a number in the paper.** Every number in the text is a named value in `paper/tables/numbers.tex`, and
+the name says what it is. Example: the Abstract says that at the 1% fingerprint, GP's test accuracy was on average
+0.48 points lower than the baseline.
+
+1. Find the value: `grep 0.48 paper/tables/numbers.tex` gives two lines; the one meant is
+   `\resGPDivTestOne` (GP, divergence from the baseline, test error, 1%). The other, `\resMcAccelBaseAcc`, is an
+   accuracy on one dataset.
+2. Find the code: `grep -n DivTest paper_tables.py` leads to `trajectory_numbers`, which takes the mean over
+   the datasets of the per-dataset mean difference, FEC minus baseline; `trajectory_pairs` (its docstring says
+   how) pairs each FEC run with the baseline run of the same seed from `results/store/generations.csv`.
+3. Find the check: `grep div/test paper/tables/claims_check.txt` shows the statement of the text built on this
+   number ("not significant across datasets") and its result.
+4. See it per dataset: Table S20 (`paper/supplementary/TableS20_divergence.csv`, column `test_diff_pp_end`)
+   lists the value behind the mean for each dataset and fraction.
 
 Where each item of the paper comes from (`paper_tables.py` unless stated):
 
@@ -116,10 +132,10 @@ Where each item of the paper comes from (`paper_tables.py` unless stated):
 | Figure 8 | `tables/fig_fake_acc.pdf` | `fake_acc_figure` |
 | Figures 9, 10 | `tables/fig_selection.pdf`, `tables/fig_divergence.pdf` | `selection_figure`, `trajectory_figure` |
 | Figure 11 | `tables/fig_fraction_tradeoff.pdf` | `fraction_tradeoff_figure` |
-| Figure 12 | `tables/fig_case_size.pdf` | `case_figures` |
-| Figures 13, 14 | `tables/fig_pair_codrna_covertype.pdf`, `tables/fig_pair_diabetes_run.pdf` | `pair_figures` |
-| Figure 15 | `tables/fig_case_mc.pdf` | `mc_figure` |
-| Figure 16 | `tables/fig_size_pairs.pdf` | `size_pair_figure` |
+| Figure 12 | `tables/fig_cost_model.pdf` | `cost_figure` |
+| Figure 13 | `tables/fig_case_mc.pdf` | `mc_figure` |
+| Figure 14 | `tables/fig_size_pairs.pdf` | `size_pair_figure` |
+| File S2, Figures S2.1-S2.3 | `tables/fig_case_size.pdf`, `tables/fig_pair_codrna_covertype.pdf`, `tables/fig_pair_diabetes_run.pdf` | `case_figures`, `pair_figures` |
 | Table 1 | `tables/corpus.tex` | `corpus_tables` |
 | Table 4 | `tables/summary_by_config.tex` | `summary_table` |
 | Table 5 | `tables/outmap.tex` | `outcome_map_tables` |
@@ -127,7 +143,7 @@ Where each item of the paper comes from (`paper_tables.py` unless stated):
 | Table 7 | `tables/size_pairs.tex` | `size_pair_table` |
 | numbers in the text | `tables/numbers.tex` | `numbers` |
 | statements in the text | `tables/claims_check.txt` | `claims` |
-| Tables S1-S20, Figures S2-S5 | `supplementary/` (`INDEX.md` lists them; `FileS1_data_dictionary.md` defines every column) | `supplementary` |
+| Tables S1-S20, Figures S2-S4 | `supplementary/` (`INDEX.md` lists them; `FileS1_data_dictionary.md` defines every column) | `supplementary` |
 
 Tables 2 and 3 (settings and operators) and Figures 3 and S1 (grammar listings, from `grammars/*.bnf`) are text in
 the manuscript, not results. `fig_case_gegp.pdf`, `fig_ge_vs_gp.pdf`, `ge_vs_gp.tex` and `grammar_props.tex` are
@@ -137,6 +153,17 @@ additional views of the same data that the paper does not show.
 a rebuild gives the same file). The font is DejaVu Serif, which ships with matplotlib. The colours are one
 colour-blind-safe palette, and a second series always also differs in line style or marker. To change a
 figure, edit its function in the table above and run `python paper_tables.py --out rebuilt`.
+
+To look at the figures only (about 30 seconds), draw them into a folder of your choice:
+
+```bash
+python paper_tables.py --figures --out figcheck   # figcheck/tables (main text), figcheck/supplementary
+```
+
+The plots are drawn at the printed width of the paper's text column (`figstyle.TEXT_WIDTH`, 5.46 in), so text set
+at 8 pt (`figstyle.BASE_SIZE`) prints at 8 pt; the two diagrams of `diagrams.py` are wider and printed across the
+full page width at their drawn size. Panels are labelled (a), (b), ... by `figstyle.label_panels`, called from
+`figstyle.save`, which also writes any raster part of a figure (a colour bar) at 600 dpi.
 
 ### 4. Rerun experiments
 

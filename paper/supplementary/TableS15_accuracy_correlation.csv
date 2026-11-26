@@ -1,4 +1,4 @@
-algorithm,dataset,rows,fraction,dAcc_pp,p_worse_rho0.0,p_rope_rho0.0,verdict_rho0.0,p_worse_rho0.1,p_rope_rho0.1,verdict_rho0.1,p_worse_rho0.2,p_rope_rho0.2,verdict_rho0.2,p_worse_rho0.3,p_rope_rho0.3,verdict_rho0.3,p_worse_rho0.4,p_rope_rho0.4,verdict_rho0.4,p_worse_rho0.5,p_rope_rho0.5,verdict_rho0.5
+algorithm,dataset,rows,fraction,dAcc_pp,p_worse_kappa0.0,p_rope_kappa0.0,verdict_kappa0.0,p_worse_kappa0.1,p_rope_kappa0.1,verdict_kappa0.1,p_worse_kappa0.2,p_rope_kappa0.2,verdict_kappa0.2,p_worse_kappa0.3,p_rope_kappa0.3,verdict_kappa0.3,p_worse_kappa0.4,p_rope_kappa0.4,verdict_kappa0.4,p_worse_kappa0.5,p_rope_kappa0.5,verdict_kappa0.5
 GE,wine_quality,2554,0.01,-2.0,0.998,0.002,worse,0.929,0.071,undecided,0.855,0.144,undecided,0.797,0.194,undecided,0.751,0.225,undecided,0.711,0.238,undecided
 GE,wine_quality,2554,0.05,-0.38,0.001,0.999,equivalent,0.064,0.935,undecided,0.137,0.854,undecided,0.194,0.776,undecided,0.242,0.698,undecided,0.282,0.619,undecided
 GE,wine_quality,2554,0.1,-0.05,0.002,0.997,equivalent,0.072,0.872,undecided,0.146,0.729,undecided,0.204,0.613,undecided,0.25,0.519,undecided,0.29,0.439,undecided

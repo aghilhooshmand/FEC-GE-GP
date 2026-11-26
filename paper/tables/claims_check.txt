@@ -119,6 +119,8 @@ ok   mc/nearly-twice: §6.5: S_T on accelerometer nearly twice that on covertype
 ok   mc/work-words: §6.5: hits avoided about two thirds of the work on accelerometer (0.6-0.75) and less than half on covertype
 ok   mc/size-words: §6.5: a hit program was nearly as large as a missed one on accelerometer (> 0.7) and about a third of it on covertype (0.25-0.4)
 ok   mc/weak-baseline: §6.5: GE's baseline accuracy on accelerometer well below gradient boosting (> 0.1 lower)
+ok   mc/near-binary: §6.5: Run_or_walk_information and codrna are the binary tables nearest in rows below and above accelerometer
+ok   mc/near-slower: §6.5: S_T at 5% lower on Run_or_walk_information and codrna than on accelerometer
 ok   mc/lhc-largest: §6.5: lhc_jets is the largest table of the corpus
 ok   mc/lhc-multiclass: §6.5: lhc_jets and sleep have more than two classes
 ok   mc/lhc-slower: §6.5: S_T lower on lhc_jets than on accelerometer at every fraction
@@ -134,7 +136,10 @@ ok   pool/fig10: Fig 10: fake-hit ratio higher on wine_quality than on covertype
 ok   pool/fig11: Fig 11: hit/miss program size larger on accelerometer than on covertype at every fraction
 ok   pool/fig13: Fig 13: GP programs larger and GP's hits avoiding more work than GE's at every fraction
 ok   sizepair/sleep-electricity: §6.6: sleep vs electricity (GE, 1%): similar size (within 1.5x) and hit rate (within 0.05), larger hit/miss size ratio, more work avoided and higher S_T for the first
+ok   sizepair/sleep-electricity-eq7: §6.4, Table 7: sleep and electricity: diagnostic hit rates within 0.03, and Equation 7 with the table's h and r gives its w (within 0.005)
 ok   sizepair/dry_bean-phoneme_balanced: §6.6: dry_bean vs phoneme_balanced (GE, 5%): similar size (within 1.5x) and hit rate (within 0.05), larger hit/miss size ratio, more work avoided and higher S_T for the first
+ok   sizepair/dry_bean-phoneme_balanced-eq7: §6.4, Table 7: dry_bean and phoneme_balanced: diagnostic hit rates within 0.03, and Equation 7 with the table's h and r gives its w (within 0.005)
+ok   sizepair/words: §6.4: hit programs almost as large as missed ones on sleep (r > 0.9), about half the size on electricity (0.4-0.6)
 ok   sizepair/gp-elec: §6.6 GP: electricity and electricity_cat at 5%: same rows, hit rates within 0.05, larger size ratio and more work avoided on electricity, yet the smaller S_T
 ok   sizepair/gp-small: §6.6 GP: wine_quality has the larger size ratio than dry_bean at 5% but S_T at or below one and below that of the other
 ok   sizepair/gp-weak: §6.6 GP: between similar GP tables S_T follows the size ratio in no more than about half of the pairs
@@ -149,19 +154,20 @@ ok   rope/GP/no-worse-better: §5 GP: at none of +-1/2/3 pp was a configuration 
 ok   rope/GP/only-undecided-to-equivalent: §5 GP: a wider ROPE only moved configurations from undecided to equivalent
 ok   rho/fewer-equivalent: §5: a larger rho gives fewer equivalent configurations (never more)
 ok   rho/none-worse-from-0.2: §5: no configuration judged worse at any rho from 0.2 to 0.5
-ok   rho/zero-worse-small-one: §5: the configurations worse at rho = 0 are undecided at rho = 0.2 and use a 1% fingerprint on the smallest tables
+ok   rho/zero-worse-small-one: §5: the configurations worse at kappa = 0 are undecided at kappa = 0.2 and use a 1% fingerprint on the smallest tables
 ok   size/fake-not-rows: §5.5: at the same fingerprint size, the table size had no detectable effect on the fake-hit ratio (95% interval of b_rows contains 0, GE and GP)
 ok   size/fake-fp: §5.5: a larger fingerprint gave fewer fake hits and smaller errors per fake hit (interval of b_fp below 0, GE and GP)
 ok   size/err-near-inverse: §5.5: the error per fake hit fell about in proportion to the fingerprint size (b_fp between -1.1 and -0.8, GE and GP)
 ok   size/st-rows: §5.1/5.2: at the same fingerprint size a larger table gave a larger S_T, also with the share of work avoided in the model (interval of b_rows above 0, GE and GP)
 ok   size/st-fp: §5.1/5.2: at the same table size a larger fingerprint gave a smaller S_T (GE and GP)
 ok   size/within: §4.4: b_fp equals the within-table slope (the same three fractions on every table; fingerprint rounding aside)
-ok   size/overlap: §4.4: every table shares fingerprint sizes with a table at least three times larger or smaller
+ok   size/overlap: §4.3: for every table, its range of fingerprint sizes (1% to 10%) overlaps that of at least one table three or more times larger or smaller
 ok   size/err-rows: §5.5: at the same fingerprint size, a larger table gave smaller errors per fake hit in GP (interval below 0) but not in GE (interval contains 0)
 ok   size/fp-stable: §6.2: the fingerprint-size effects changed little when one dataset was left out (leave-one-out range inside the bootstrap interval, every measure)
 ok   size/rows-wider: §6.2: the intervals of the table-size effects were wider than those of the fingerprint-size effects (S_T, hit rate, fake-hit ratio, error per fake hit; GE and GP)
 ok   size/acc-fp: §5.5: a larger fingerprint on the same table gave a smaller |Delta Acc| (interval below 0) and no effect of table size at the same fingerprint size was detected (interval contains 0), GE and GP
 ok   size/large-one-thousands: §6.1: on the largest tables a 1% fingerprint has thousands of rows (three largest, >= 1,000)
+ok   guide/mid-gradual: §6.1: between 150 and 350 rows the share of generations with a worst fake hit over 1 pp falls gradually: every configuration there is above the >= 350 group's maximum, and the two largest sizes in the band are all below the smallest size
 ok   guide/small-often-not-faster: §6.1: on the smallest datasets FEC was often not faster (at least half of their configurations not significantly faster)
 ok   guide/one-pct-usually-fastest: §6.1: on the datasets where 1% reaches the threshold, 1% had the highest mean S_T of the three fractions usually (all but at most one dataset per algorithm)
 ok   guide/many-rows: §6.1: with at least 350 fingerprint rows, the worst fake hit exceeded 1 pp in at most 2% of generations (every configuration, both algorithms)
@@ -170,14 +176,18 @@ ok   guide/bands-by-size: §6.1: the fraction needed to reach the row threshold 
 ok   guide/no-ten-pct-band: §6.1: no dataset needs 10% to reach the row threshold (the bands are 1%, 5%, none)
 ok   guide/small-are-smallest3: §6.1: the datasets that do not reach the threshold even at 10% are the three smallest (the ones §6.2 discusses)
 ok   cost/rule: §6.2: the rule w > c gave the observed side of S_T = 1 in all but at most one configuration per algorithm
+ok   cost/rule-same: Abstract: the rule was right in the same number of configurations in GE and GP, out of the same total (\resGECostRight of \resCostN for each algorithm)
 ok   cost/rank: §6.2: predicted and measured S_T rank the configurations alike (Spearman >= 0.85, both)
 ok   cost/err-small: §6.2: the typical (median absolute) prediction error is at most 15% (both)
 ok   cost/gp-over: §6.2: in GP the model tends to overestimate S_T (median signed error > 0)
 ok   cost/wine-example: §6.2: GP wine_quality 1%: most work avoided (w > 0.8) but the fingerprint costs a full evaluation or more (c >= 1) and FEC was slower
+ok   cost/accel-cover: §6.3: accelerometer vs covertype at 5%: both fingerprints cheap (c < 0.1); w higher on accelerometer; predicted and measured S_T both higher there
+ok   cost/table7-pairs: §6.4: in both Table 7 pairs the table with the larger w has the larger predicted and measured S_T
+ok   cost/phoneme-below: §6.4: phoneme_balanced 5%: w < c, predicted and measured S_T below 1.05
 ok   cost/pilot-ge: §6.2: in GE a 5-generation pilot gave the right decision as often as the whole run
 ok   cost/pilot-gp-cautious: §6.2: in GP a 5-generation pilot was wrong more often, and all but at most one of its mistakes rejected FEC where it was faster
 ok   cost/pilot-gp-longer: §6.2: in GP a 10-generation pilot was right more often than a 5-generation one
-ok   cost/pilot-ge-early-gp-late: §6.2 / Figure S5: GE came within one decision of the whole run after at most 5 generations, GP only after at least 15
+ok   cost/pilot-ge-early-gp-late: §6.2 / Figure fig:cost-model: GE came within one decision of the whole run after at most 5 generations, GP only after at least 15
 ok   mem/all-runs: §5.3: every paper dataset x algorithm x fraction has its 30 seeds
 ok   mem/entries-below-evals: §5.3: no cache held more entries than its run had evaluations
 ok   mem/entries-gp-more: §5.3: GP stored more entries than GE (medians)
@@ -202,12 +212,17 @@ ok   div/early: §5.5: separation came early (median generation <= 6 in every al
 ok   div/abs-at-ten: §5.5: at 10% the best training errors still differed by at least 0.5 pp on average
 ok   div/no-drift-rest: §5.5: at 5% and 10% the mean signed difference of best training error at the end is within 0.1 pp (both)
 ok   div/gp1-grows: §5.5 / Figure fig:divergence: in GP at 1% the mean signed difference grows from generation 5 to 10 to 20 to 30
-ok   div/gp1-worse: §5.5: GP at 1% ended significantly worse in training and test error (Wilcoxon p < 0.001)
-ok   div/test-rest-ns: §5.5: at 5% and 10% the test error of FEC and baseline did not differ significantly (Wilcoxon p >= 0.05, both algorithms)
+ok   div/gp1-worse: §5.5: GP at 1% ended significantly worse in training error (Wilcoxon over the per-dataset means, p < 0.05)
+ok   div/test-one-ns: §5.5 / Abstract: at 1% the test error of FEC was higher on average but not significantly across datasets (Wilcoxon over per-dataset means p >= 0.05, GE and GP)
+ok   div/test-rest-ns: §5.5 / Abstract: at 5% and 10% the test error of FEC and baseline did not differ significantly (Wilcoxon over per-dataset means p >= 0.05, both algorithms)
 ok   div/ge1-smaller: §5.5: GE at 1% ended worse than its baseline, but by less than GP at 1%
+ok   abs/configs: Abstract: 51 configurations per algorithm = datasets x three fractions
+ok   div/test-one-small: §5.5: the three smallest datasets account for more than three quarters of the summed 1% test-error difference (GE and GP)
 ok   exact/below-fec: §5.3: the shadow exact cache hit less often than FEC in every configuration
 ok   exact/more-entries: §5.3: an exact cache would store more entries than FEC in every configuration
 ok   exact/all-runs: §5.3: every configuration has its 30 instrumented runs
+ok   exact/gp-few: §5.5, §6: an exact cache would hit few GP evaluations (< 15% in every configuration)
+ok   exact/ge-binary-much: §5.5, §7: in GE on binary tables exact repeats alone accounted for much of the hit rate (median exact-cache rate >= half of FEC's at every fraction)
 ok   gegp-eq/mid-gp-faster: §6.7: where both kept their accuracy, GP was faster on every mid-sized table, its hits skipping programs larger than its misses (ratio > 1) while GE's were less than half the size of a miss
 ok   gegp-eq/large-ge-faster: §6.7: where both kept their accuracy on the large tables, GE was faster in every configuration and GP hit the cache less often
 ok   gegp-eq/work-orders-speed: §6.7: in every configuration where both kept their accuracy, the algorithm whose hits avoided more work had the larger S_T

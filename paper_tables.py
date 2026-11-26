@@ -9,7 +9,7 @@ without results is written with a visible \\RES mark, never dropped.
 Output, under the output folder (default: paper/, the published ones; FEC_PAPER_DIR overrides):
     tables/          LaTeX tables, numbers.tex (one macro per number in the text), the main-text figures (PDF)
                      and claims_check.txt (every statement of the text checked against the data: OK or FAIL)
-    supplementary/   Tables S1-S20 (CSV), Figures S1-S5 (PDF), INDEX.md and FileS1_data_dictionary.md
+    supplementary/   Tables S1-S20 (CSV), Figures S1-S4 (PDF), INDEX.md, FileS1_data_dictionary.md and File S2 (PDF from supplementary_src)
 
     python paper_tables.py                  write everything into the output folder
     python paper_tables.py --out DIR        write into DIR/tables and DIR/supplementary instead
@@ -172,13 +172,14 @@ def same_content(new: Path, old: Path) -> bool:
     return a == b
 
 
-def build(out_tables: Path, out_supp: Path, min_rows: int = 0, store: Path = results.STORE) -> list[Path]:
-    """Write every table; returns the files written. Table functions are added per task."""
+def build(out_tables: Path, out_supp: Path, min_rows: int = 0, store: Path = results.STORE,
+          builders: list | None = None) -> list[Path]:
+    """Write every table and figure (or only those of `builders`); returns the files written."""
     corpus = paper_corpus()
     metrics, props = load_store(store, only=corpus.dataset)
     main = metrics[metrics.sampler == MAIN_SAMPLER].reset_index(drop=True)
     written = []
-    for fn in BUILDERS:
+    for fn in (BUILDERS if builders is None else builders):
         written += fn(corpus=corpus, metrics=main, all_metrics=metrics, props=props, out_tables=out_tables,
                       out_supp=out_supp, min_rows=min_rows, manuscript=PAPER / "FEC_manuscript_final.tex")
     return written
@@ -441,7 +442,7 @@ def results_tables(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[
         excluded = (", ".join(_tt(d) for d in MAIN_TEXT_EXCLUDED)
                     + f" are reported in Table~S{2 if algo == 'GE' else 3} only.") if MAIN_TEXT_EXCLUDED else ""
         rows_note = f" Datasets with fewer than {min_rows:,} rows are left out." if min_rows else ""
-        caption = (f"{algo}: per dataset and sampler, the smallest fingerprint fraction $\\rho$ at which FEC is "
+        caption = (f"{algo}: per dataset and sampler, the smallest fingerprint fraction $\\varphi$ at which FEC is "
                    "significantly faster (paired Wilcoxon, \\rev{Holm over the algorithm's 51 configurations}, "
                    f"$\\alpha={ALPHA}$); when none is, the 1\\% configuration is shown and marked n.s. $S_T$: mean "
                    "$\\pm$ sd over 30 paired runs ($^{\\blacktriangle}$ faster, $^{\\blacktriangledown}$ slower). "
@@ -450,7 +451,7 @@ def results_tables(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[
                    "$S_E$: effort speedup. Samp.: farthest-point sampling time in seconds. "
                    f"{excluded}{rows_note}")
         body_tex = _longtable(f"tab:results-{algo.lower()}", caption, "llrrrrlrr",
-                              "Dataset & Sampler & $\\rho$ & $S_T$ & $\\Delta$Acc & P(eq.) & Verdict & $S_E$ & Samp.",
+                              "Dataset & Sampler & $\\varphi$ & $S_T$ & $\\Delta$Acc & P(eq.) & Verdict & $S_E$ & Samp.",
                               body, "results/store/metrics.csv")
         written.append(write(out_tables, f"results_{algo.lower()}.tex", body_tex))
     return written
@@ -481,16 +482,14 @@ def summary_table(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[P
                                         f"{_pp(g.dAcc.median())} [{_pp(g.dAcc.quantile(0.25))}, {_pp(g.dAcc.quantile(0.75))}]",
                                         "/".join(str(v.get(k, 0)) for k in shown)]))
     absent = [k for k in ("worse", "better") if k not in shown]
-    none_note = f" No configuration was judged {' or '.join(absent)}." if absent else ""
+    none_note = f"; no configuration was judged {' or '.join(absent)}." if absent else "."
     t = _table("tab:summary",
-               "Summary per algorithm and fingerprint fraction $\\rho$ (random fingerprint rows) over the datasets "
-               "with results ($n$). $S_T$ and "
-               "$\\Delta$Acc: median [interquartile range] over the $n$ datasets of the per-dataset values "
-               "($\\Delta$Acc in percentage points). Faster/slower: datasets with a significant difference in evaluation "
-               "time (paired Wilcoxon, \\rev{Holm-adjusted} $p \\leq 0.05$ \\rev{over the algorithm's 51 configurations}), out of $n$. "
-               f"Verdicts: number of the $n$ datasets judged {' / '.join(shown)} by the Bayesian correlated "
-               f"$t$-test (probability $\\geq {THRESHOLD}$).{none_note}",
-               "rrlrll", "$\\rho$ & $n$ & Median $S_T$ & Faster/slower & Median $\\Delta$Acc & "
+               "Summary per algorithm and fingerprint fraction $\\varphi$ over the $n$ datasets. $S_T$ and $\\Delta$Acc "
+               "(percentage points): median [interquartile range] across datasets. Faster/slower: datasets with a "
+               "significant difference in evaluation time (Wilcoxon, Holm-adjusted $p \\leq 0.05$). "
+               f"{'/'.join(shown).capitalize()}: verdicts of the Bayesian correlated $t$-test "
+               f"(probability $\\geq {THRESHOLD}$){none_note}",
+               "rrlrll", "$\\varphi$ & $n$ & Median $S_T$ & Faster/slower & Median $\\Delta$Acc & "
                + "/".join(k.capitalize() if i == 0 else k for i, k in enumerate(shown)),
                body, "results/store/metrics.csv")
     return [write(out_tables, "summary_by_config.tex", t)]
@@ -686,7 +685,7 @@ def ge_vs_gp_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> list
     w = w.groupby(level=0).mean()                                  # one point per dataset, as in the test
     rng = np.random.default_rng(0)
     fs.use()
-    fig, axes = plt.subplots(1, len(GEGP_MEASURES), figsize=(6.3, 2.5))
+    fig, axes = plt.subplots(1, len(GEGP_MEASURES), figsize=fs.size(2.5))
     colours = (SERIES_COLOUR, SECOND_COLOUR)
     for ax, (col, label, scale, _d) in zip(axes, GEGP_MEASURES):
         vals = [scale * w[(col, a)].to_numpy() for a in ("GE", "GP")]
@@ -939,15 +938,15 @@ def hit_kinds_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> lis
     per = h[np.isclose(h.fraction, REPEAT_FRACTION)].groupby(["algorithm", "dataset"])[[k for k, _ in HIT_KINDS]].mean()
     order = props.set_index("dataset").loc[[d for d in keep if d in set(h.dataset)], "rows"].sort_values(kind="stable").index
     colours = {"structural": SERIES_COLOUR, "behavioural": THIRD_COLOUR, "nonequiv": SECOND_COLOUR}
-    names = {"structural": "(a) structurally equivalent", "behavioural": "(b) fitness-equivalent",
-             "nonequiv": "(c) not equivalent (fake hit)"}
+    names = {"structural": "structurally equivalent", "behavioural": "fitness-equivalent",
+             "nonequiv": "not equivalent (fake hit)"}
     # (b) split by predictions where the instrumented runs recorded them (hit_split); elsewhere unsplit
     sp = hit_split(set(keep))
     sp = sp[np.isclose(sp.fraction, REPEAT_FRACTION)].set_index(["algorithm", "dataset"]).beh_share
     measured = {d for d in order if all((a, d) in sp.index for a in ("GE", "GP"))}
     partial = bool(measured) and len(measured) < len(order)        # mark the measured ones only if not all are
     fs.use()
-    fig, axes = plt.subplots(2, 1, figsize=(6.3, 4.8), sharex=True)
+    fig, axes = plt.subplots(2, 1, figsize=fs.size(4.8), sharex=True)
     x = np.arange(len(order))
     for ax, algo in zip(axes, ("GE", "GP")):
         d = per.loc[algo].reindex(order)
@@ -958,13 +957,13 @@ def hit_kinds_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> lis
                 has = ~np.isnan(share)
                 same, rest = d[k].values * np.where(has, share, 0), d[k].values * np.where(has, 1 - share, 0)
                 ax.bar(x, same, bottom=bottom, width=0.72, color=THIRD_COLOUR, edgecolor="white", linewidth=1.0,
-                       label="(b) fitness-equivalent: same predictions", zorder=2)
+                       label="fitness-equivalent: same predictions", zorder=2)
                 ax.bar(x, rest, bottom=bottom + same, width=0.72, color=THIRD_COLOUR, alpha=0.4, edgecolor="white",
-                       linewidth=1.0, label="(b) fitness-equivalent: equal fitness only", zorder=2)
+                       linewidth=1.0, label="fitness-equivalent: equal fitness only", zorder=2)
                 if partial:
                     ax.bar(x, np.where(has, 0, d[k].values), bottom=bottom, width=0.72, color=THIRD_COLOUR,
                            hatch="////", edgecolor="white", linewidth=1.0,
-                           label="(b) fitness-equivalent: predictions not recorded", zorder=2)
+                           label="fitness-equivalent: predictions not recorded", zorder=2)
             else:
                 ax.bar(x, d[k], bottom=bottom, width=0.72, color=colours[k], edgecolor="white", linewidth=1.0,
                        label=names[k], zorder=2)
@@ -982,7 +981,7 @@ def hit_kinds_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> lis
                             rotation=45, ha="right", fontsize=7)
     handles, labels = axes[0].get_legend_handles_labels()
     fig.legend(handles, labels, loc="upper center", ncol=3 if len(labels) <= 3 else 2, frameon=False, fontsize=7)
-    fig.tight_layout(rect=(0, 0, 1, 0.95 if len(labels) <= 3 else 0.90))
+    fig.tight_layout(h_pad=1.6, rect=(0, 0, 1, 0.95 if len(labels) <= 3 else 0.90))
     path = out_tables / "fig_hit_kinds.pdf"
     fs.save(fig, path)
     plt.close(fig)
@@ -1227,12 +1226,10 @@ def severity_table(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[
                                 f"{r.worst_median_pp:.2f}", f"{r.worst_p90_pp:.1f}", f"{100 * r.gens_worst_over_1pp:.0f}",
                                 _small_pct(100 * r.gens_worst_over_5pp), f"{r.worst_max_pp:.1f}"]))
     tex = _table("tab:fake-severity",
-                 "How far the fitness of a fake hit was from its true value, over all tables (random fingerprint "
-                 "rows, diagnostic runs, 30 seeds; generations with at least one fake hit). Mean error: mean "
-                 "absolute difference between the cached and the full-training-set error rate per fake hit. Worst: "
-                 "the largest difference in a generation, as median and 90th percentile over the generations, the "
-                 "share of generations in which it exceeded 1 and 5 percentage points, and the largest value "
-                 "observed. Differences in percentage points (pp). Per table in Table~S13.",
+                 "Error of fake hits over all datasets (diagnostic runs, 30 seeds; generations with at least one "
+                 "fake hit). Mean error: mean absolute difference between the cached and the true training error "
+                 "rate per fake hit. Worst: the largest difference in a generation, summarised over the "
+                 "generations. Per dataset: Table~S13.",
                  "llrrrrrr", "Alg. & Fraction & Mean error (pp) & Worst, median (pp) & Worst, 90th pct (pp) & "
                  "$>$1 pp (\\%) & $>$5 pp (\\%) & Largest (pp)",
                  body, "results/store/generations.csv", colsep="4pt")
@@ -1458,20 +1455,16 @@ def outcome_map_tables(corpus, metrics, props, out_tables, min_rows=0, **_) -> l
     head = head_top + "Dataset & Rows & GB & " + " & ".join(["$S_T$ & $S_\\mathrm{wall}$ & $\\Delta$Acc"] * len(fracs))
     worse = (ann.verdict == "worse").any()                         # mention x only if it occurs
     t = _table("tab:outmap",
-               "GE and GP with random fingerprint rows at each fingerprint fraction: evaluation-time speedup $S_T$ and "
-               "accuracy difference $\\Delta$Acc (FEC minus baseline, percentage points). $S_T$ (Equation~(\\ref{eq:st})), "
-               "\\rev{equal to the ratio of the mean times, $\\pm$ the standard deviation of the 30 per-run ratios "
-               "$T_r^{\\mathrm{base}}/T_r^{\\mathrm{FEC}}$}; \\rev{$S_\\mathrm{wall}$: the same ratio for the time of "
-               "the whole run, $\\pm$ the standard deviation of the 30 per-run ratios}; "
-               "$\\Delta$Acc: mean $\\pm$ sd of the 30 paired differences. "
-               "$\\blacktriangle$/$\\blacktriangledown$: significantly faster/slower (paired Wilcoxon, \\rev{Holm-adjusted} "
-               "$p \\leq 0.05$ \\rev{over the algorithm's 51 configurations}); "
-               "$\\approx$: practically equivalent"
+               "Speedup and accuracy per dataset and fingerprint fraction. $S_T$: evaluation-time speedup "
+               "(Equation~(\\ref{eq:st})); $S_\\mathrm{wall}$: whole-run speedup; both are ratios of the mean times "
+               "$\\pm$ the standard deviation of the 30 per-run ratios. $\\Delta$Acc: FEC minus baseline, mean "
+               "$\\pm$ sd of the 30 paired differences, in percentage points. $\\blacktriangle$/$\\blacktriangledown$: "
+               "significantly faster/slower (Wilcoxon, Holm-adjusted $p \\leq 0.05$); $\\approx$: practically "
+               "equivalent"
                + (", $\\times$: worse" if worse else "")
-               + f" (Bayesian correlated $t$-test, probability $\\geq {THRESHOLD}$, region $\\pm 1$ pp). "
-               "Dataset name in bold: FEC was both significantly faster and practically equivalent at one or more "
-               "fractions, for that algorithm. GB: balanced accuracy of gradient boosting. "
-               "\\rev{The seconds saved per run}: Tables S2 (GE) and S3 (GP).",
+               + f" (probability $\\geq {THRESHOLD}$, ROPE $\\pm 1$ pp). Bold dataset name: faster and equivalent at "
+               "one or more fractions. GB: balanced accuracy of gradient boosting. Seconds saved per run: Tables S2 "
+               "and S3.",
                "lrr" + "rrr" * len(fracs), head, body, "results/store/metrics.csv", size="\\footnotesize",
                colsep="2.4pt", overhang=True)                # portrait, full width
     return [write(out_tables, "outmap.tex", t)]
@@ -1684,7 +1677,7 @@ def correlation_detail(metrics: pd.DataFrame, props: pd.DataFrame, thr: float = 
                         "fraction": g.fraction.round(2), "dAcc_pp": (100 * g.dAcc).round(2)})
     for rho in CORRELATIONS:
         pr = probabilities_under(g, results.EQUIVALENCE_MARGIN, thr, props, rho=rho)
-        tag = f"rho{rho:.1f}"
+        tag = f"kappa{rho:.1f}"
         out[f"p_worse_{tag}"], out[f"p_rope_{tag}"] = pr.p_worse.round(3), pr.p_rope.round(3)
         out[f"verdict_{tag}"] = pr.verdict
     return out.sort_values(["algorithm", "rows", "dataset", "fraction"], kind="stable").reset_index(drop=True)
@@ -1715,7 +1708,7 @@ def split_overlap(props: pd.DataFrame, datasets, seeds=PAPER_SEEDS, test_size: f
 
 def correlation_numbers(metrics: pd.DataFrame, props: pd.DataFrame) -> dict:
     """Macros of §4.4 / §5: equivalent and worse counts per rho; the configurations judged
-    worse when the runs are taken as independent (rho = 0) with their P(worse) under the test's rho = 0.2; the
+    worse when the runs are taken as independent (kappa = 0) with their P(worse) under the test's kappa = 0.2; the
     baseline's run-to-run spread of test accuracy (median sd over the datasets, pp)."""
     out = {}
     t = correlation_detail(metrics, props)
@@ -1724,16 +1717,16 @@ def correlation_numbers(metrics: pd.DataFrame, props: pd.DataFrame) -> dict:
         if not len(x):
             continue
         for rho in CORRELATIONS:
-            out[f"{algo}EquivRho{RHO_WORD[rho]}"] = str(int((x[f"verdict_rho{rho:.1f}"] == "equivalent").sum()))
-            out[f"{algo}WorseRho{RHO_WORD[rho]}"] = str(int((x[f"verdict_rho{rho:.1f}"] == "worse").sum()))
-    w = t[t["verdict_rho0.0"] == "worse"].sort_values(["algorithm", "rows", "fraction"], kind="stable")
+            out[f"{algo}EquivRho{RHO_WORD[rho]}"] = str(int((x[f"verdict_kappa{rho:.1f}"] == "equivalent").sum()))
+            out[f"{algo}WorseRho{RHO_WORD[rho]}"] = str(int((x[f"verdict_kappa{rho:.1f}"] == "worse").sum()))
+    w = t[t["verdict_kappa0.0"] == "worse"].sort_values(["algorithm", "rows", "fraction"], kind="stable")
     out["RhoZeroWorseN"] = str(len(w))
     cfg = [f"{r.algorithm} on {_tt(r.dataset)} at {100 * r.fraction:.0f}\\%" for r in w.itertuples()]
     out["RhoZeroWorseConfigs"] = "none" if not cfg else cfg[0] if len(cfg) == 1 else ", ".join(cfg[:-1]) + " and " + cfg[-1]
     out["RhoZeroWorseDaccMin"] = f"{-w.dAcc_pp.max():.1f}" if len(w) else "--"     # losses, positive pp
     out["RhoZeroWorseDaccMax"] = f"{-w.dAcc_pp.min():.1f}" if len(w) else "--"
-    out["RhoZeroWorsePMin"] = f"{w['p_worse_rho0.2'].min():.2f}" if len(w) else "--"
-    out["RhoZeroWorsePMax"] = f"{w['p_worse_rho0.2'].max():.2f}" if len(w) else "--"
+    out["RhoZeroWorsePMin"] = f"{w['p_worse_kappa0.2'].min():.2f}" if len(w) else "--"
+    out["RhoZeroWorsePMax"] = f"{w['p_worse_kappa0.2'].max():.2f}" if len(w) else "--"
     ov = split_overlap(props, sorted(set(metrics.dataset) & set(props.dataset)))
     if len(ov):
         out["SplitTestOverlapMean"] = f"{100 * ov.test_mean.mean():.0f}"
@@ -1765,16 +1758,16 @@ def correlation_claims(metrics: pd.DataFrame, props: pd.DataFrame) -> list[tuple
                     "from undecided to equivalent", ((v[0.01] != "equivalent") | (v[0.02] == "equivalent")).all()
                     and ((v[0.02] != "equivalent") | (v[0.03] == "equivalent")).all()))
     t = correlation_detail(metrics, props)
-    eq = {(a, rho): int((t[t.algorithm == a][f"verdict_rho{rho:.1f}"] == "equivalent").sum())
+    eq = {(a, rho): int((t[t.algorithm == a][f"verdict_kappa{rho:.1f}"] == "equivalent").sum())
           for a in ("GE", "GP") for rho in CORRELATIONS}
     out.append(("rho/fewer-equivalent", "§5: a larger rho gives fewer equivalent configurations (never more)",
                 all(eq[(a, r1)] >= eq[(a, r2)] for a in ("GE", "GP") for r1, r2 in zip(CORRELATIONS, CORRELATIONS[1:]))))
     out.append(("rho/none-worse-from-0.2", "§5: no configuration judged worse at any rho from 0.2 to 0.5",
-                all(not (t[f"verdict_rho{r:.1f}"] == "worse").any() for r in CORRELATIONS if r >= 0.2)))
-    w = t[t["verdict_rho0.0"] == "worse"]
+                all(not (t[f"verdict_kappa{r:.1f}"] == "worse").any() for r in CORRELATIONS if r >= 0.2)))
+    w = t[t["verdict_kappa0.0"] == "worse"]
     small = set(props.sort_values("rows", kind="stable").dataset.iloc[:N_ENDS])
-    out.append(("rho/zero-worse-small-one", "§5: the configurations worse at rho = 0 are undecided at rho = 0.2 and use "
-                "a 1% fingerprint on the smallest tables", len(w) > 0 and (w["verdict_rho0.2"] == "undecided").all()
+    out.append(("rho/zero-worse-small-one", "§5: the configurations worse at kappa = 0 are undecided at kappa = 0.2 and use "
+                "a 1% fingerprint on the smallest tables", len(w) > 0 and (w["verdict_kappa0.2"] == "undecided").all()
                 and (w.fraction.round(2) == 0.01).all() and set(w.dataset) <= small))
     return out
 
@@ -1950,8 +1943,8 @@ def size_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = result
     out.append(("size/within", "§4.4: b_fp equals the within-table slope (the same three fractions on every table; fingerprint rounding aside)",
                 bool(has) and all(abs(t.loc[(a, y, "rows+fp", "log_fp"), "coef"] - _within_slope(d[d.algorithm == a], y)) < 0.01
                                   for a in has for y in SIZE_OUTCOMES if y not in SIZE_LINEAR)))
-    out.append(("size/overlap", "§4.4: every table shares fingerprint sizes with a table at least three times larger "
-                "or smaller", size_overlap(d)["overlap"] == size_overlap(d)["tables"]))
+    out.append(("size/overlap", "§4.3: for every table, its range of fingerprint sizes (1% to 10%) overlaps that of at "
+                "least one table three or more times larger or smaller", size_overlap(d)["overlap"] == size_overlap(d)["tables"]))
     out.append(("size/err-rows", "§5.5: at the same fingerprint size, a larger table gave smaller errors per fake hit "
                 "in GP (interval below 0) but not in GE (interval contains 0)",
                 "GP" in has and "GE" in has and ci("GP", "error_per_fake_pp", "log_rows")[1] < 0
@@ -1994,7 +1987,7 @@ def size_fingerprint_figure(design: pd.DataFrame, out_dir: Path) -> Path:
     path = out_dir / "FigureS4_size_vs_fingerprint.pdf"
     if design.empty:                               # no runs in the store: a placeholder, as the CSVs' "no data"
         fs.use()
-        fig = plt.figure(figsize=(6.3, 1))
+        fig = plt.figure(figsize=fs.size(1))
         fig.text(0.5, 0.5, "no data", ha="center", va="center", color=INK_SECONDARY)
         fs.save(fig, path)
         plt.close(fig)
@@ -2003,7 +1996,7 @@ def size_fingerprint_figure(design: pd.DataFrame, out_dir: Path) -> Path:
     norm = LogNorm(design.rows.min(), design.rows.max())
     t = size_model(design).set_index(["algorithm", "measure", "model", "term"])
     fs.use()
-    fig, axes = plt.subplots(2, 2, figsize=(6.3, 5.2), sharex=True)
+    fig, axes = plt.subplots(2, 2, figsize=fs.size(5.2), sharex=True)
     for r, algo in enumerate(("GE", "GP")):
         g = design[design.algorithm == algo]
         for c, (y, label) in enumerate((("fake_hit_ratio", "fake-hit ratio (log scale)"), ("S_T", "$S_T$"))):
@@ -2026,12 +2019,9 @@ def size_fingerprint_figure(design: pd.DataFrame, out_dir: Path) -> Path:
                 ax.spines[side].set_visible(False)
             if (algo, y, "rows+fp", "log_rows") in t.index:
                 fr, ff = (t.loc[(algo, y, "rows+fp", k)] for k in ("log_rows", "log_fp"))
-                fs.title(ax, algo)
-                ax.text(0.98, 0.97, f"dataset rows x10: {fr.factor:.2f} [{fr.factor_low:.2f}, {fr.factor_high:.2f}]\n"
-                                    f"fingerprint rows x10: {ff.factor:.2f} [{ff.factor_low:.2f}, "
-                                    f"{ff.factor_high:.2f}]", transform=ax.transAxes, ha="right", va="top",
-                        fontsize=fs.BASE_SIZE - 1, color=INK_SECONDARY, linespacing=1.3,
-                        bbox=dict(fc="white", ec="none", alpha=0.85, pad=1.5))
+                fs.title(ax, algo, f"dataset $\\times$10: {fr.factor:.2f} [{fr.factor_low:.2f}, {fr.factor_high:.2f}]\n"
+                                   f"fingerprint $\\times$10: {ff.factor:.2f} [{ff.factor_low:.2f}, "
+                                   f"{ff.factor_high:.2f}]", stacked=True)   # above the panel, no point covered
             ax.set_ylabel(label)
             if r == 1:
                 ax.set_xlabel("fingerprint rows (log scale)")
@@ -2115,7 +2105,23 @@ def guide_numbers(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = resu
             "GuideOneRowsMin": _int(rows[one].min()),
             "GuideFiveRowsMin": _int(rows[five].min()), "GuideFiveRowsMax": _int(rows[five].max()),
             "GuideSmallNames": _names(none), "GuideSmallRowsMax": _int(rows[none].max()),
-            "GuideSmallTenMax": _int(d[d.dataset.isin(none) & np.isclose(d.fraction, 0.1)].fp_rows.max())}
+            "GuideSmallTenMax": _int(d[d.dataset.isin(none) & np.isclose(d.fraction, 0.1)].fp_rows.max()),
+            **_guide_mid(d)}
+
+
+def _guide_mid(d: pd.DataFrame) -> dict:
+    """§6.1: the configurations between GUIDE_FEW and GUIDE_ROWS rows: the share of generations whose worst fake hit
+    exceeded 1 pp at the smallest fingerprint size in that band, and at its two largest sizes."""
+    mid = d[(d.fp_rows >= GUIDE_FEW) & (d.fp_rows < GUIDE_ROWS)]
+    if mid.empty:
+        return {}
+    sizes = sorted(mid.fp_rows.unique())
+    first, last = mid[mid.fp_rows == sizes[0]], mid[mid.fp_rows.isin(sizes[-2:])]
+    pct = lambda v: f"{100 * v:.0f}"
+    return {"GuideMidFirstRows": _int(sizes[0]), "GuideMidFirstLo": pct(first.gens_worst_over_1pp.min()),
+            "GuideMidFirstHi": pct(first.gens_worst_over_1pp.max()), "GuideMidLastRowsLo": _int(sizes[-2]),
+            "GuideMidLastRowsHi": _int(sizes[-1]), "GuideMidLastLo": pct(last.gens_worst_over_1pp.min()),
+            "GuideMidLastHi": pct(last.gens_worst_over_1pp.max())}
 
 
 def guide_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = results.STORE) -> list[tuple[str, str, bool]]:
@@ -2123,6 +2129,15 @@ def guide_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = resul
     d = guide_design(metrics, props, store)
     if d.empty:
         return []
+    mid = d[(d.fp_rows >= GUIDE_FEW) & (d.fp_rows < GUIDE_ROWS)]
+    sizes = sorted(mid.fp_rows.unique())
+    first, last = mid[mid.fp_rows == sizes[0]], mid[mid.fp_rows.isin(sizes[-2:])]
+    mid_claims = [("guide/mid-gradual", f"§6.1: between {GUIDE_FEW} and {GUIDE_ROWS} rows the share of generations with a "
+                   "worst fake hit over 1 pp falls gradually: every configuration there is above the >= 350 group's "
+                   "maximum, and the two largest sizes in the band are all below the smallest size",
+                   bool(len(sizes) >= 3 and mid.gens_worst_over_1pp.min()
+                        > d[d.fp_rows >= GUIDE_ROWS].gens_worst_over_1pp.max()
+                        and last.gens_worst_over_1pp.max() < first.gens_worst_over_1pp.min()))]
     band = _guide_bands(d)
     rows = props.set_index("dataset")["rows"]
     order = sorted(band, key=lambda ds: rows[ds])
@@ -2132,7 +2147,7 @@ def guide_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = resul
     small = a[a.dataset.isin(smallest3)]
     st = a.groupby(["algorithm", "dataset", "fraction"]).S_T.mean()
     large = [ds for ds, f in band.items() if f == 0.01]
-    return [
+    return mid_claims + [
         ("guide/small-often-not-faster", "§6.1: on the smallest datasets FEC was often not faster (at least half of "
          "their configurations not significantly faster)", bool((small.speed != "faster").mean() >= 0.5)),
         ("guide/one-pct-usually-fastest", "§6.1: on the datasets where 1% reaches the threshold, 1% had the highest "
@@ -2232,7 +2247,10 @@ def cost_design(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = result
     return x.sort_values(["algorithm", "rows", "dataset", "fraction"], kind="stable")[cols].reset_index(drop=True)
 
 
-COST_EXAMPLES = (("GE", "bank_marketing", 0.1, "BankTen"), ("GP", "wine_quality", 0.01, "WineOne"))
+COST_EXAMPLES = (("GE", "bank_marketing", 0.1, "BankTen"), ("GP", "wine_quality", 0.01, "WineOne"),
+                 ("GE", "accelerometer", 0.05, "AccelFive"), ("GE", "covertype", 0.05, "CoverFive"),    # §6.3
+                 ("GE", "sleep", 0.01, "SleepOne"), ("GE", "electricity", 0.01, "ElecOne"),              # §6.4, Table 7
+                 ("GE", "dry_bean", 0.05, "BeanFive"), ("GE", "phoneme_balanced", 0.05, "PhonFive"))
 
 
 def cost_numbers(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = results.STORE) -> dict:
@@ -2260,12 +2278,33 @@ def cost_numbers(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = resul
     for a, ds, f, key in COST_EXAMPLES:
         r = d[(d.algorithm == a) & (d.dataset == ds) & np.isclose(d.fraction, f)].iloc[0]
         out.update({f"Cost{key}C": f"{r.fp_cost:.2f}", f"Cost{key}W": f"{r.work_avoided:.2f}",
-                    f"Cost{key}Pred": f"{r.S_T_predicted:.2f}", f"Cost{key}ST": f"{r.S_T:.2f}"})
+                    f"Cost{key}Pred": f"{r.S_T_predicted:.2f}", f"Cost{key}ST": f"{r.S_T:.2f}",
+                    f"Cost{key}WPct": f"{100 * r.work_avoided:.0f}"})
     return out
 
 
 def _num_word(n: int) -> str:
     return {5: "Five", 10: "Ten"}[n]
+
+
+def _cost_case_claims(d: pd.DataFrame) -> list[tuple[str, str, bool]]:
+    """§6.3 and §6.4: what the case comparisons say in terms of the cost model (GE)."""
+    def r(ds, f):
+        return d[(d.algorithm == "GE") & (d.dataset == ds) & np.isclose(d.fraction, f)].iloc[0]
+    acc, cov = r("accelerometer", 0.05), r("covertype", 0.05)
+    slp, ele = r("sleep", 0.01), r("electricity", 0.01)
+    bean, pho = r("dry_bean", 0.05), r("phoneme_balanced", 0.05)
+    return [
+        ("cost/accel-cover", "§6.3: accelerometer vs covertype at 5%: both fingerprints cheap (c < 0.1); w higher on "
+         "accelerometer; predicted and measured S_T both higher there",
+         bool(acc.fp_cost < 0.1 and cov.fp_cost < 0.1 and acc.work_avoided > cov.work_avoided
+              and acc.S_T_predicted > cov.S_T_predicted and acc.S_T > cov.S_T)),
+        ("cost/table7-pairs", "§6.4: in both Table 7 pairs the table with the larger w has the larger predicted and "
+         "measured S_T", bool(all(x.work_avoided > y.work_avoided and x.S_T_predicted > y.S_T_predicted and x.S_T > y.S_T
+                                  for x, y in ((slp, ele), (bean, pho))))),
+        ("cost/phoneme-below", "§6.4: phoneme_balanced 5%: w < c, predicted and measured S_T below 1.05",
+         bool(pho.work_avoided < pho.fp_cost and pho.S_T_predicted < 1.05 and pho.S_T < 1.05)),
+    ]
 
 
 def cost_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = results.STORE) -> list[tuple[str, str, bool]]:
@@ -2280,6 +2319,9 @@ def cost_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = result
     return [
         ("cost/rule", "§6.2: the rule w > c gave the observed side of S_T = 1 in all but at most one configuration per "
          "algorithm", bool(ge.rule_right.sum() >= len(ge) - 1 and gp.rule_right.sum() >= len(gp) - 1)),
+        ("cost/rule-same", "Abstract: the rule was right in the same number of configurations in GE and GP, out of the "
+         "same total (\\resGECostRight of \\resCostN for each algorithm)",
+         bool(ge.rule_right.sum() == gp.rule_right.sum() and len(ge) == len(gp))),
         ("cost/rank", "§6.2: predicted and measured S_T rank the configurations alike (Spearman >= 0.85, both)",
          all(spearmanr(y.S_T, y.S_T_predicted).statistic >= 0.85 for y in (ge, gp))),
         ("cost/err-small", "§6.2: the typical (median absolute) prediction error is at most 15% (both)",
@@ -2289,13 +2331,14 @@ def cost_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = result
         ("cost/wine-example", "§6.2: GP wine_quality 1%: most work avoided (w > 0.8) but the fingerprint costs a full "
          "evaluation or more (c >= 1) and FEC was slower", bool(wine.work_avoided > 0.8 and wine.fp_cost >= 1
                                                                  and wine.S_T < 1)),
+        *_cost_case_claims(d),
         ("cost/pilot-ge", "§6.2: in GE a 5-generation pilot gave the right decision as often as the whole run",
          bool(ge.rule_right_gen1_5.sum() >= ge.rule_right.sum())),
         ("cost/pilot-gp-cautious", "§6.2: in GP a 5-generation pilot was wrong more often, and all but at most one of "
          "its mistakes rejected FEC where it was faster", bool(len(gp5) > 5 and (gp5.S_T > 1).sum() >= len(gp5) - 1)),
         ("cost/pilot-gp-longer", "§6.2: in GP a 10-generation pilot was right more often than a 5-generation one",
          bool(gp.rule_right_gen1_10.sum() > gp.rule_right_gen1_5.sum())),
-        ("cost/pilot-ge-early-gp-late", "§6.2 / Figure S5: GE came within one decision of the whole run after at most "
+        ("cost/pilot-ge-early-gp-late", "§6.2 / Figure fig:cost-model: GE came within one decision of the whole run after at most "
          "5 generations, GP only after at least 15",
          bool(int(cost_numbers(metrics, props, store)["GECostPilotNear"]) <= 5
               and int(cost_numbers(metrics, props, store)["GPCostPilotNear"]) >= 15)),
@@ -2552,6 +2595,21 @@ def selection_claims(keep, store: Path = results.STORE) -> list[tuple[str, str, 
     return out
 
 
+def _sd_band(ax, d: pd.DataFrame, col: str, scale: float, sd: pd.DataFrame, color: str, lo=None, hi=None) -> None:
+    """Shaded band: the plotted curve +- one standard deviation over the datasets (per generation), clipped to the
+    measure's range; drawn under the lines."""
+    s = d.merge(sd, on="gen", how="left")
+    y, e = scale * s[col].to_numpy(float), scale * s["sd"].fillna(0).to_numpy(float)
+    low, high = y - e, y + e
+    if lo is not None:
+        low = np.maximum(low, lo)
+    if hi is not None:
+        high = np.minimum(high, hi)
+    ax.fill_between(s.gen, low, high, color=color, alpha=0.2, linewidth=0, zorder=2)
+    for edge in (low, high):                    # thin outline: keeps the palest (1%) band visible in print
+        ax.plot(s.gen, edge, color=color, linewidth=0.7, alpha=0.8, zorder=2)
+
+
 def selection_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
     """fig_selection.pdf (§5.5): over the generations, mean over datasets and seeds, per fingerprint fraction: the share
     of tournaments with a truly worse winner, how much worse it was (pp) and the rank correlation of used and true
@@ -2566,7 +2624,7 @@ def selection_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
     g = selection_generations(keep, store)
     if g.empty:
         fs.use()
-        fig = plt.figure(figsize=(6.3, 1))
+        fig = plt.figure(figsize=fs.size(1))
         fig.text(0.5, 0.5, "no data", ha="center", va="center", color=INK_SECONDARY)
         fs.save(fig, path)
         plt.close(fig)
@@ -2574,9 +2632,16 @@ def selection_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
     tr = _sel_trend(g)
     gap = g[g.gen > 0].groupby(["algorithm", "fraction", "gen"]).gap_pp.mean().rename("gap").reset_index()
     rk = g.groupby(["algorithm", "fraction", "gen"]).ins_spearman.mean().rename("rho").reset_index()
+    k = ["algorithm", "fraction", "gen", "dataset"]
+    gg = g[g.gen > 0]
+    per = {"changed": (gg.groupby(k).ins_tourn_changed.sum() / gg.groupby(k).ins_tournaments.sum()).rename("v"),
+           "gap": gg.groupby(k).gap_pp.mean().rename("v"), "rho": g.groupby(k).ins_spearman.mean().rename("v")}
+    sds = {c: v.reset_index().groupby(["algorithm", "fraction", "gen"]).v.std().rename("sd").reset_index()
+           for c, v in per.items()}
+    bounds = {"changed": (0, 100), "gap": (0, None), "rho": (None, 1)}
     style = FRACTION_STYLE
     fs.use()
-    fig, axes = plt.subplots(3, 2, figsize=(6.3, 6.6), sharex=True)
+    fig, axes = plt.subplots(3, 2, figsize=fs.size(6.6), sharex=True)
     panels = ((tr, "changed", 100, "tournaments with a truly\nworse winner (%)"),
               (gap, "gap", 1, "how much worse the\nwinner truly was (pp)"),
               (rk, "rho", 1, "rank correlation,\nused vs true fitness"))
@@ -2586,7 +2651,10 @@ def selection_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
             ends = {}
             for f, (c, ls) in style.items():
                 y = d[(d.algorithm == algo) & np.isclose(d.fraction, f)].sort_values("gen", kind="stable")
-                ax.plot(y.gen, scale * y[col], color=c, linestyle=ls, linewidth=1.6)
+                sd = sds[col]
+                _sd_band(ax, y, col, scale, sd[(sd.algorithm == algo) & np.isclose(sd.fraction, f)][["gen", "sd"]],
+                         c, *bounds[col])
+                ax.plot(y.gen, scale * y[col], color=c, linestyle=ls, linewidth=1.6, zorder=3)
                 ends[f] = (y.gen.iloc[-1], scale * y[col].iloc[-1])
             _end_labels(ax, ends)
             ax.grid(color=GRID, linewidth=0.6, zorder=0)
@@ -2598,7 +2666,7 @@ def selection_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
                 ax.set_ylabel(label)
         fs.title(axes[0, j], algo)
         axes[2, j].set_xlabel("generation")
-    fig.tight_layout()
+    fig.tight_layout(h_pad=2.4)
     fs.save(fig, path)
     plt.close(fig)
     return path
@@ -2664,7 +2732,19 @@ def _traj_curve(m: pd.DataFrame) -> pd.DataFrame:
         train=("d_train", "mean"), test=("d_test", "mean")).reset_index()
 
 
-def trajectory_numbers(keep, store: Path = results.STORE) -> dict:
+def _ds_mean(x: pd.DataFrame, col: str) -> pd.Series:
+    """One value per dataset: the mean of `col` over its runs (the unit of the trajectory tests)."""
+    return x.groupby("dataset")[col].mean()
+
+
+def _small_share(x: pd.DataFrame, props: pd.DataFrame, n: int = 3) -> float:
+    """Share of the summed per-dataset mean test-error difference that comes from the n smallest datasets."""
+    per = _ds_mean(x, "d_test")
+    small = props.set_index("dataset").loc[per.index, "rows"].sort_values(kind="stable").index[:n]
+    return per[small].sum() / per.sum()
+
+
+def trajectory_numbers(keep, store: Path = results.STORE, props: pd.DataFrame | None = None) -> dict:
     """Macros \\resDiv...: §5.5."""
     from scipy.stats import wilcoxon
     r = trajectory_runs(keep, store)
@@ -2682,8 +2762,9 @@ def trajectory_numbers(keep, store: Path = results.STORE) -> dict:
             out[f"{a}DivAbs{w}"] = f"{x.d_train.abs().mean():.1f}"
             out[f"{a}DivSigned{w}"] = f"{x.d_train.mean():+.2f}"
             out[f"{a}DivTest{w}"] = f"{x.d_test.mean():+.2f}"
-            out[f"{a}DivSignedP{w}"] = _p(wilcoxon(x.d_train).pvalue)
-            out[f"{a}DivTestP{w}"] = _p(wilcoxon(x.d_test).pvalue)
+            # the 30 runs of one dataset are not independent: test the per-dataset means (one value per dataset)
+            out[f"{a}DivSignedP{w}"] = _p(wilcoxon(_ds_mean(x, "d_train")).pvalue)
+            out[f"{a}DivTestP{w}"] = _p(wilcoxon(_ds_mean(x, "d_test")).pvalue)
             out[f"{a}DivSignedGenTen{w}"] = f"{cc.train.loc[10]:+.2f}"
     later = r[r.first_div.notna()]
     out["DivNever"] = str(int(r.first_div.isna().sum()))
@@ -2694,6 +2775,10 @@ def trajectory_numbers(keep, store: Path = results.STORE) -> dict:
     gens, gaps = grp.first_div.median(), grp.d_train.apply(lambda v: v.abs().mean())
     out["DivGenMin"], out["DivGenMax"] = f"{gens.min():.0f}", f"{gens.max():.0f}"
     out["DivAbsMin"], out["DivAbsMax"] = f"{gaps.min():.1f}", f"{gaps.max():.1f}"
+    if props is not None:                         # §5.5: where the 1% test-error loss came from
+        for a in ("GE", "GP"):
+            x = r[(r.algorithm == a) & np.isclose(r.fraction, 0.01)]
+            out[f"{a}DivTestSmallShare"] = f"{100 * _small_share(x, props):.0f}"
     return out
 
 
@@ -2725,10 +2810,12 @@ def trajectory_claims(keep, store: Path = results.STORE) -> list[tuple[str, str,
          "within 0.1 pp (both)", bool(rest.d_train.mean().abs().max() <= 0.1)),
         ("div/gp1-grows", "§5.5 / Figure fig:divergence: in GP at 1% the mean signed difference grows from generation 5 to 10 to 20 to 30",
          bool(gp1.loc[5] < gp1.loc[10] < gp1.loc[20] < gp1.loc[30])),
-        ("div/gp1-worse", "§5.5: GP at 1% ended significantly worse in training and test error (Wilcoxon p < 0.001)",
-         _div_sig(r, "GP")),
-        ("div/test-rest-ns", "§5.5: at 5% and 10% the test error of FEC and baseline did not differ significantly "
-         "(Wilcoxon p >= 0.05, both algorithms)", _div_test_ns(r)),
+        ("div/gp1-worse", "§5.5: GP at 1% ended significantly worse in training error (Wilcoxon over the per-dataset "
+         "means, p < 0.05)", _div_sig(r, "GP")),
+        ("div/test-one-ns", "§5.5 / Abstract: at 1% the test error of FEC was higher on average but not significantly "
+         "across datasets (Wilcoxon over per-dataset means p >= 0.05, GE and GP)", _div_test_one_ns(r)),
+        ("div/test-rest-ns", "§5.5 / Abstract: at 5% and 10% the test error of FEC and baseline did not differ "
+         "significantly (Wilcoxon over per-dataset means p >= 0.05, both algorithms)", _div_test_ns(r)),
         ("div/ge1-smaller", "§5.5: GE at 1% ended worse than its baseline, but by less than GP at 1%",
          bool(0 < r[(r.algorithm == "GE") & np.isclose(r.fraction, 0.01)].d_train.mean()
               < r[(r.algorithm == "GP") & np.isclose(r.fraction, 0.01)].d_train.mean())),
@@ -2737,15 +2824,33 @@ def trajectory_claims(keep, store: Path = results.STORE) -> list[tuple[str, str,
 
 def _div_test_ns(r: pd.DataFrame) -> bool:
     from scipy.stats import wilcoxon
-    return all(wilcoxon(x.d_test).pvalue >= 0.05 for (_, f), x in r.groupby(["algorithm", "fraction"])
+    return all(wilcoxon(_ds_mean(x, "d_test")).pvalue >= 0.05 for (_, f), x in r.groupby(["algorithm", "fraction"])
                if not np.isclose(f, 0.01))
+
+
+def _div_test_one_ns(r: pd.DataFrame) -> bool:
+    from scipy.stats import wilcoxon
+    one = r[np.isclose(r.fraction, 0.01)]
+    return all(x.d_test.mean() > 0 and wilcoxon(_ds_mean(x, "d_test")).pvalue >= 0.05 for _, x in one.groupby("algorithm"))
 
 
 def _div_sig(r: pd.DataFrame, algo: str) -> bool:
     from scipy.stats import wilcoxon
     x = r[(r.algorithm == algo) & np.isclose(r.fraction, 0.01)]
-    return bool(x.d_train.mean() > 0 and x.d_test.mean() > 0 and wilcoxon(x.d_train).pvalue < 0.001
-                and wilcoxon(x.d_test).pvalue < 0.001)
+    return bool(x.d_train.mean() > 0 and wilcoxon(_ds_mean(x, "d_train")).pvalue < 0.05)
+
+
+def abstract_claims(keep, props) -> list[tuple[str, str, bool]]:
+    """Statements of the Abstract that no other section checks."""
+    r = trajectory_runs(keep)
+    out = [("abs/configs", "Abstract: 51 configurations per algorithm = datasets x three fractions",
+            3 * len(keep) == 51)]
+    if not r.empty:
+        one = r[np.isclose(r.fraction, 0.01)]
+        out.append(("div/test-one-small", "§5.5: the three smallest datasets account for more than three quarters of "
+                    "the summed 1% test-error difference (GE and GP)",
+                    all(_small_share(x, props) > 0.75 for _, x in one.groupby("algorithm"))))
+    return out
 
 
 def trajectory_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
@@ -2762,17 +2867,23 @@ def trajectory_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
     m = trajectory_pairs(keep, store)
     if m.empty:
         fs.use()
-        fig = plt.figure(figsize=(6.3, 1))
+        fig = plt.figure(figsize=fs.size(1))
         fig.text(0.5, 0.5, "no data", ha="center", va="center", color=INK_SECONDARY)
         fs.save(fig, path)
         plt.close(fig)
         return path
     c = _traj_curve(m)
+    per = (m.assign(sep=1 - m.same_pop.astype(float), absd=m.d_train.abs())
+           .groupby(["algorithm", "fraction", "gen", "dataset"])
+           .agg(diverged=("sep", "mean"), abs_train=("absd", "mean"), train=("d_train", "mean")).reset_index())
+    sds = {col: per.groupby(["algorithm", "fraction", "gen"])[col].std().rename("sd").reset_index()
+           for col in ("diverged", "abs_train", "train")}
+    bounds = {"diverged": (0, 100), "abs_train": (0, None), "train": (None, None)}
     panels = (("diverged", 100, "FEC runs separated\nfrom the baseline (%)"),
               ("abs_train", 1, "best training error,\n|FEC - baseline| (pp)"),
               ("train", 1, "best training error,\nFEC - baseline (pp)"))
     fs.use()
-    fig, axes = plt.subplots(3, 2, figsize=(6.3, 6.6), sharex=True)
+    fig, axes = plt.subplots(3, 2, figsize=fs.size(6.6), sharex=True)
     for j, algo in enumerate(("GE", "GP")):
         for i, (col, scale, label) in enumerate(panels):
             ax = axes[i, j]
@@ -2781,6 +2892,9 @@ def trajectory_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
             ends = {}
             for f, (cl, ls) in FRACTION_STYLE.items():
                 y = c[(c.algorithm == algo) & np.isclose(c.fraction, f)].sort_values("gen", kind="stable")
+                sd = sds[col]
+                _sd_band(ax, y, col, scale, sd[(sd.algorithm == algo) & np.isclose(sd.fraction, f)][["gen", "sd"]],
+                         cl, *bounds[col])
                 ax.plot(y.gen, scale * y[col], color=cl, linestyle=ls, linewidth=1.6, zorder=3)
                 ends[f] = (y.gen.iloc[-1], scale * y[col].iloc[-1])
             _end_labels(ax, ends)
@@ -2798,7 +2912,7 @@ def trajectory_figure(keep, out_dir: Path, store: Path = results.STORE) -> Path:
         hi = max(axes[i, 0].get_ylim()[1], axes[i, 1].get_ylim()[1])
         for ax in axes[i]:
             ax.set_ylim(lo, hi)
-    fig.tight_layout()
+    fig.tight_layout(h_pad=2.4)
     fs.save(fig, path)
     plt.close(fig)
     return path
@@ -2841,7 +2955,7 @@ def exact_runs(keep, store: Path = results.STORE) -> pd.DataFrame:
                     entry_ratio=(r.ins_exact_lookups - r.ins_exact_hits) / r.fec_misses)
 
 
-def exact_numbers(keep, store: Path = results.STORE) -> dict:
+def exact_numbers(keep, props=None, store: Path = results.STORE) -> dict:
     """Macros \\resExact...: the shadow exact cache at REPEAT_FRACTION, medians over datasets."""
     r = exact_runs(keep, store)
     if r.empty:
@@ -2851,10 +2965,14 @@ def exact_numbers(keep, store: Path = results.STORE) -> dict:
     for a in ("GE", "GP"):
         x = d.loc[a]
         out[f"{a}Exact"], out[f"{a}ExactFec"] = f"{100 * x.exact.median():.0f}", f"{100 * x.fec.median():.0f}"
+    if props is not None:                       # §5.5: GE on binary tables, where exact repeats are common
+        b = d.loc["GE"].join(props.set_index("dataset")["classes"])
+        b = b[b.classes == 2]
+        out["GEExactBin"], out["GEExactFecBin"] = f"{100 * b.exact.median():.0f}", f"{100 * b.fec.median():.0f}"
     return out
 
 
-def exact_claims(keep, store: Path = results.STORE) -> list[tuple[str, str, bool]]:
+def exact_claims(keep, props=None, store: Path = results.STORE) -> list[tuple[str, str, bool]]:
     r = exact_runs(keep, store)
     if r.empty:
         return []
@@ -2866,7 +2984,13 @@ def exact_claims(keep, store: Path = results.STORE) -> list[tuple[str, str, bool
          bool((c.entry_ratio > 1).all())),
         ("exact/all-runs", "§5.3: every configuration has its 30 instrumented runs",
          bool((r.groupby(["algorithm", "dataset", "fraction"]).size() == 30).all())),
-    ]
+        ("exact/gp-few", "§5.5, §6: an exact cache would hit few GP evaluations (< 15% in every configuration)",
+         bool((c.loc["GP"].exact < 0.15).all())),
+    ] + ([] if props is None else [
+        ("exact/ge-binary-much", "§5.5, §7: in GE on binary tables exact repeats alone accounted for much of the hit "
+         "rate (median exact-cache rate >= half of FEC's at every fraction)",
+         bool(all(g.exact.median() >= 0.5 * g.fec.median() for _f, g in
+                  c.loc["GE"].join(props.set_index("dataset")["classes"]).query("classes == 2").groupby(level="fraction"))))])
 
 
 def dynamics_figures(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[Path]:
@@ -2876,7 +3000,7 @@ def dynamics_figures(corpus, metrics, props, out_tables, min_rows=0, **_) -> lis
 
 
 def cost_figure(design: pd.DataFrame, out_dir: Path) -> Path:
-    """FigureS5_cost_model.pdf: predicted against measured S_T (log-log), one point per configuration, coloured by
+    """fig_cost_model.pdf (main text, §6.2): predicted against measured S_T (log-log), one point per configuration, coloured by
     the rows of the dataset (as Figure S4), the line of equality and the lines S_T = 1; GE and GP."""
     import matplotlib
     matplotlib.use("Agg")
@@ -2885,11 +3009,11 @@ def cost_figure(design: pd.DataFrame, out_dir: Path) -> Path:
     fs.use()
     out_dir.mkdir(parents=True, exist_ok=True)
     from matplotlib.ticker import FixedFormatter, FixedLocator, NullLocator
-    path = out_dir / "FigureS5_cost_model.pdf"
+    path = out_dir / "fig_cost_model.pdf"
     meta = {"CreationDate": None, "ModDate": None, "Producer": None, "Creator": None}
     if design.empty:
         fs.use()
-        fig = plt.figure(figsize=(6.3, 1))
+        fig = plt.figure(figsize=fs.size(1))
         fig.text(0.5, 0.5, "no data", ha="center", va="center", color=INK_SECONDARY)
         fs.save(fig, path)
         plt.close(fig)
@@ -2899,7 +3023,7 @@ def cost_figure(design: pd.DataFrame, out_dir: Path) -> Path:
     lo = 0.9 * min(design.S_T.min(), design.S_T_predicted.min())
     hi = 1.1 * max(design.S_T.max(), design.S_T_predicted.max())
     fs.use()
-    fig = plt.figure(figsize=(6.3, 5.4))
+    fig = plt.figure(figsize=fs.size(5.4))
     gs = fig.add_gridspec(2, 2, height_ratios=(1, 0.8))
     axes = [fig.add_subplot(gs[0, 0])]
     axes.append(fig.add_subplot(gs[0, 1], sharex=axes[0], sharey=axes[0]))
@@ -2943,7 +3067,7 @@ def cost_figure(design: pd.DataFrame, out_dir: Path) -> Path:
         pax.spines[side].set_visible(False)
     pax.set_xlabel("pilot length: generations 1 to n used to estimate w")
     pax.set_ylabel(f"rule right (of {n})")
-    fs.title(pax, "Short pilot", "rule w > c with w from generations 1 to n only (c from the whole run)")
+    fs.title(pax, "Short pilot", "w from generations 1 to n, c from the whole run")
     fig.tight_layout(rect=(0, 0, 0.86, 1))
     cax = fig.add_axes((0.875, 0.5, 0.015, 0.4))
     cb = fig.colorbar(plt.cm.ScalarMappable(norm=norm, cmap=cmap), cax=cax)
@@ -3073,8 +3197,9 @@ def numbers(corpus, metrics, props, out_tables, min_rows=0, all_metrics=None, **
     out.update(cost_numbers(metrics[metrics.dataset.isin(keep)], props))
     out.update(memory_numbers(keep, props))
     out.update(selection_numbers(keep))
-    out.update(trajectory_numbers(keep))
-    out.update(exact_numbers(keep))
+    out.update(trajectory_numbers(keep, props=props))
+    out["ConfigsPerAlg"] = str(3 * len(keep))                  # datasets x three fingerprint fractions
+    out.update(exact_numbers(keep, props))
     out.update(fraction_tradeoff_numbers(ann))
     out.update(pair_numbers(metrics[metrics.dataset.isin(keep)]))
     for algo in ("GE", "GP"):
@@ -3234,7 +3359,7 @@ def size_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[Pat
     for col, ref, label, stem in (("S_T", 1.0, "speedup (mean over fractions)", "fig_st_rows"),
                                   ("dAcc_pp", 0.0, "$\\Delta$Acc, pp (mean over fractions)", "fig_dacc_rows")):
         fs.use()
-        fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.5), sharey=True)
+        fig, axes = plt.subplots(1, 2, figsize=fs.size(2.5), sharey=True)
         for ax, algo in zip(axes, ("GE", "GP")):
             d = per[per.algorithm == algo]
             ax.axhline(ref, color=INK_SECONDARY, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
@@ -3257,9 +3382,9 @@ def size_figure(corpus, metrics, props, out_tables, min_rows=0, **_) -> list[Pat
             if len(d) > 2:
                 rho, pval = spearmanr(d.rows, d[col])
                 ptxt = f"p = {pval:.3f}" if pval >= 0.001 else "p < 0.001"
-                fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {len(d)}")
+                fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {len(d)}", stacked=True)
             else:
-                fs.title(ax, algo, f"n = {len(d)}")
+                fs.title(ax, algo, f"n = {len(d)}", stacked=True)
         axes[0].set_ylabel(label)
         if len(per) and col == "S_T":
             lo = min(0.8, per[["S_T_lo", "S_wall"]].min().min() - 0.1)
@@ -3312,7 +3437,7 @@ def _rows_panel(ax, d: pd.DataFrame, col: str, algo: str, xlabel: bool) -> None:
         ax.set_xlabel("rows (log scale)")
     rho, pval, n = dataset_rho(d, col, "rows")
     ptxt = f"p = {pval:.3f}" if pval >= 0.001 else "p < 0.001"
-    fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {n}" if n > 2 else f"n = {n}")
+    fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {n}" if n > 2 else f"n = {n}", stacked=True)
 
 
 def cache_figure(metrics: pd.DataFrame, rows_of: pd.Series, out_tables: Path,
@@ -3329,9 +3454,9 @@ def cache_figure(metrics: pd.DataFrame, rows_of: pd.Series, out_tables: Path,
         metrics = metrics.assign(overhead=np.nan)
     per = _per_dataset(metrics, rows_of, ["hit_rate", "overhead", "S_T"])
     fs.use()
-    fig, axes = plt.subplots(3, 2, figsize=(6.3, 6.8), sharey="row")
+    fig, axes = plt.subplots(3, 2, figsize=fs.size(6.8), sharey="row")
     for r, (col, label) in enumerate((("hit_rate", "hit rate"),
-                                      ("overhead", "fingerprint step per candidate\n/ full evaluation"))):
+                                      ("overhead", "fingerprint cost $c$\n(relative to a full evaluation)"))):
         for c, algo in enumerate(("GE", "GP")):
             _rows_panel(axes[r, c], per[per.algorithm == algo], col, algo, xlabel=r == 1)
         axes[r, 0].set_ylabel(label)
@@ -3343,11 +3468,11 @@ def cache_figure(metrics: pd.DataFrame, rows_of: pd.Series, out_tables: Path,
         ax.set_axisbelow(True)
         for side in ("top", "right"):
             ax.spines[side].set_visible(False)
-        ax.set_xlabel("fingerprint step per candidate / full evaluation")
+        ax.set_xlabel("fingerprint cost $c$")
         ax.set_xlim(0, max(1.0, float(per.overhead.max()) + 0.05))
         rho, pval, n = dataset_rho(d, "S_T", "overhead")
         ptxt = f"p = {pval:.3f}" if pval >= 0.001 else "p < 0.001"
-        fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {n}" if n > 2 else f"n = {n}")
+        fs.title(ax, algo, f"Spearman $\\rho$ = {rho:.2f}, {ptxt}, n = {n}" if n > 2 else f"n = {n}", stacked=True)
     axes[2, 0].set_ylabel("speedup $S_T$")
     axes[0, 0].set_ylim(0, 1)
     if per.overhead_hi.notna().any():
@@ -3419,7 +3544,7 @@ def fake_acc_by_fraction_figure(metrics: pd.DataFrame, out_dir: Path) -> Path:
     m = metrics.assign(absd=lambda d: 100 * d.dAcc.abs(), fr=lambda d: d.fraction.round(2))
     stats = fake_acc_by_fraction(metrics)
     fs.use()
-    fig, axes = plt.subplots(2, 3, figsize=(6.3, 4.4), sharey=True, sharex="row")
+    fig, axes = plt.subplots(2, 3, figsize=fs.size(4.4), sharey=True, sharex="row")
     for r, algo in enumerate(("GE", "GP")):
         for c, fr in enumerate((0.01, 0.05, 0.10)):
             ax, g = axes[r, c], m[(m.algorithm == algo) & (m.fr == fr)]
@@ -3430,7 +3555,7 @@ def fake_acc_by_fraction_figure(metrics: pd.DataFrame, out_dir: Path) -> Path:
                 ax.spines[side].set_visible(False)
             rho, pval, n = stats.get((algo, fr), (float("nan"), float("nan"), 0))
             ptxt = f"p = {pval:.3f}" if pval >= 0.001 else "p < 0.001"
-            fs.title(ax, f"{algo}, {FRACTION_WORD[fr].replace(chr(92), '')}", f"$\\rho$ = {rho:.2f}, {ptxt}")
+            fs.title(ax, f"{algo}, {FRACTION_WORD[fr].replace(chr(92), '')}", f"$\\rho$ = {rho:.2f}, {ptxt}", stacked=True)
             if r == 1:
                 ax.set_xlabel("fake-hit ratio")
         axes[r, 0].set_ylabel("|$\\Delta$Acc|, pp")
@@ -3452,7 +3577,7 @@ def fake_acc_figure(metrics: pd.DataFrame, rows_of: pd.Series, out_tables: Path)
     import matplotlib.pyplot as plt
     per = _per_dataset(metrics, rows_of, ["fake_hit_ratio"])
     fs.use()
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.5), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=fs.size(2.5), sharey=True)
     for ax, algo in zip(axes, ("GE", "GP")):
         _rows_panel(ax, per[per.algorithm == algo], "fake_hit_ratio", algo, xlabel=True)
     axes[0].set_ylabel("fake-hit ratio")
@@ -3474,7 +3599,7 @@ def fake_acc_paired_figure(metrics: pd.DataFrame, out_dir: Path) -> Path:
     fs.use()
     m = metrics.assign(absd=lambda d: 100 * d.dAcc.abs())
     fs.use()
-    fig, axes = plt.subplots(1, 2, figsize=(6.3, 2.9), sharey=True)
+    fig, axes = plt.subplots(1, 2, figsize=fs.size(2.9), sharey=True)
     lim = 0.0
     for ax, algo in zip(axes, ("GE", "GP")):
         g = m[m.algorithm == algo].dropna(subset=["fake_hit_ratio", "absd"])
@@ -3496,7 +3621,7 @@ def fake_acc_paired_figure(metrics: pd.DataFrame, out_dir: Path) -> Path:
         st = fake_acc_stats(metrics, algo)
         if st:
             ptxt = f"p = {st['wilcoxon_p']:.3f}" if st["wilcoxon_p"] >= 0.001 else "p < 0.001"
-            fs.title(ax, algo, f"{st['larger']} of {st['n']} above the line, Wilcoxon {ptxt}")
+            fs.title(ax, algo, f"{st['larger']} of {st['n']} above the line, Wilcoxon {ptxt}", stacked=True)
     for ax in axes:
         top = lim * 1.5
         ax.plot([FLOOR_PP, top], [FLOOR_PP, top], color=INK_SECONDARY, linestyle=(0, (4, 3)), linewidth=0.8, zorder=1)
@@ -3707,7 +3832,8 @@ def claims(corpus, metrics, props, out_tables, min_rows=0, all_metrics=None, **_
     out += memory_claims(keep, props)
     out += selection_claims(keep)
     out += trajectory_claims(keep)
-    out += exact_claims(keep)
+    out += abstract_claims(keep, props)
+    out += exact_claims(keep, props)
     out += gegp_equivalent_claims(annotated(metrics[metrics.dataset.isin(keep)]), props)
     tt = gegp_train_test()
     if tt:
@@ -3838,9 +3964,9 @@ GENERATED["TableS14_accuracy_relative_rope.csv"] = (
 GENERATED["TableS15_accuracy_correlation.csv"] = (
     "Table S15", "Accuracy verdicts under other correlations between the runs",
     "Per algorithm, dataset and fingerprint fraction (random rows): Delta Acc (pp) and, for an assumed correlation "
-    "rho of 0, 0.1, 0.2, 0.3, 0.4 and 0.5 between the 30 paired runs, the posterior probabilities of worse and of "
+    "kappa of 0, 0.1, 0.2, 0.3, 0.4 and 0.5 between the 30 paired runs, the posterior probabilities of worse and of "
     "within ±1 pp and the verdict; same Bayesian correlated t-test, ROPE ±1 pp and threshold 0.95. The analysis uses "
-    "rho = 0.2 (Nadeau and Bengio: test share of the data).")
+    "kappa = 0.2 (Nadeau and Bengio: test share of the data).")
 GENERATED["TableS16_size_vs_fingerprint.csv"] = (
     "Table S16", "Dataset size and fingerprint size modelled together",
     "Per algorithm and measure (S_T, hit rate, fake-hit ratio, error per fake hit, absolute Delta Acc), one least-squares "
@@ -3862,12 +3988,6 @@ GENERATED["TableS17_cost_model.csv"] = (
     "step relative to a full evaluation (c, phase-timing runs); the share of full-evaluation work avoided by hits (w, "
     "diagnostic runs, all generations and the first 5 or 10 only); the predicted S_T = 1/(1 + c - w), with no fitted "
     "parameter, and its error; and whether the rule w > c gives the observed side of S_T = 1.")
-GENERATED["FigureS5_cost_model.pdf"] = (
-    "Figure S5", "Predicted against measured speedup",
-    "Top: measured S_T against the S_T predicted by the cost model 1/(1 + c - w) (Table S17), log scales, one point "
-    "per configuration, coloured by the number of rows of the dataset; the line of equality and the lines S_T = 1; GE "
-    "and GP (random fingerprint rows). Bottom: for how many configurations the rule w > c gives the observed side of "
-    "S_T = 1 when w comes from the first n generations only (a short pilot run) and c from the whole run.")
 GENERATED["TableS18_cache_memory.csv"] = (
     "Table S18", "Memory used by the cache",
     "Per algorithm, dataset and fingerprint fraction (random rows, diagnostic runs, 30 seeds): evaluations per run; "
@@ -4024,10 +4144,10 @@ COLUMN_DOC = {                        # one meaning per column name, shared by e
                     "(timing runs); negative: FEC slower.",
     "verdict_rope1pp": "Bayesian accuracy verdict with the predefined ROPE of ±1 pp (as Table 5).",
     **{k: v for rho in CORRELATIONS for k, v in (
-        (f"p_worse_rho{rho:.1f}", f"P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed "
+        (f"p_worse_kappa{rho:.1f}", f"P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed "
                                   f"correlation of {rho:.1f} between the runs."),
-        (f"p_rope_rho{rho:.1f}", f"P(FEC and baseline accuracy within ±1 pp), same test with correlation {rho:.1f}."),
-        (f"verdict_rho{rho:.1f}", f"Bayesian accuracy verdict (threshold 0.95) with correlation {rho:.1f}"
+        (f"p_rope_kappa{rho:.1f}", f"P(FEC and baseline accuracy within ±1 pp), same test with correlation {rho:.1f}."),
+        (f"verdict_kappa{rho:.1f}", f"Bayesian accuracy verdict (threshold 0.95) with correlation {rho:.1f}"
                                   + (" (as Table 5)." if rho == 0.2 else ".")))},
     "rope_rel5_pp": "Width of the relative ROPE, ±5 % of the baseline's error rate, in percentage points.",
     "rope_rel10_pp": "Width of the relative ROPE, ±10 % of the baseline's error rate, in percentage points.",
@@ -4279,7 +4399,7 @@ def supplementary(corpus, metrics, props, out_tables, out_supp, manuscript: Path
         cost = cost_design(in_text, props)
         written.append(write(out_supp, "TableS17_cost_model.csv", "no data\n" if cost.empty else
                              cost.to_csv(index=False, float_format="%.4g")))
-        written.append(cost_figure(cost, out_supp))                                                 # Figure S5
+        written.append(cost_figure(cost, out_tables))                                               # main text, §6.2
     mem = memory_table(set(in_text.dataset), props)
     written.append(write(out_supp, "TableS18_cache_memory.csv", "no data\n" if mem.empty else
                          mem.to_csv(index=False, float_format="%.4g")))
@@ -4343,6 +4463,7 @@ CASE_SIZE = ("wine_quality", "covertype")           # §6.2: a small and a large
 CASE_GEGP = ("electricity_cat", "Diabetes130US")    # §6.3: GE and GP on two tables of different difficulty
 CASE_MC = ("accelerometer", "covertype")          # §6.5: a multiclass and a binary table, GE
 MC_LIMITS = ("lhc_jets", "sleep")                  # §6.5: the larger and the smaller five-class table
+MC_NEAR = {"Run_or_walk_information": "Run", "codrna": "Cod"}  # §6.5: binary tables nearest in rows to accelerometer
 MC_KEY = {"accelerometer": "Accel", "covertype": "Cover", "lhc_jets": "Lhc", "sleep": "Sleep"}
 CASE_KEY = {"wine_quality": "Wine", "covertype": "Cover", "electricity_cat": "Elec", "Diabetes130US": "Diab"}
 CASE_GEN_COLUMNS = ["algorithm", "setup", "dataset", "mode", "sampler", "fraction", "seed", "gen", "avg_nodes",
@@ -4588,7 +4709,7 @@ def case_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
     # §6.2: rows GE / GP; columns hit rate, fake-hit ratio, same-program share; one line per table
     style = {CASE_SIZE[0]: dict(color=SERIES_COLOUR, linestyle="-"), CASE_SIZE[1]: dict(color=SECOND_COLOUR, linestyle="--")}
     fs.use()
-    fig, axes = plt.subplots(2, 3, figsize=(6.3, 3.9), sharex=True, sharey=True)
+    fig, axes = plt.subplots(2, 3, figsize=fs.size(3.9), sharex=True, sharey=True)
     for i, algo in enumerate(("GE", "GP")):
         for j, (col, label) in enumerate((("hit_rate", "hit rate"), ("fake_share", "fake-hit ratio"),
                                           ("same_share", "structurally equivalent hits"))):
@@ -4608,7 +4729,7 @@ def case_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
             if i == 1:
                 ax.set_xlabel("generation")
     axes[0, 1].legend(frameon=False, fontsize=7, loc="upper left")     # the empty top of the GE fake-share panel
-    fig.tight_layout()
+    fig.tight_layout(h_pad=1.6)
     p1 = out_tables / "fig_case_size.pdf"
     fs.save(fig, p1)
     plt.close(fig)
@@ -4616,7 +4737,7 @@ def case_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
     # §6.3: rows electricity_cat / Diabetes130US; columns program size (log), fitness diversity, work avoided
     style = {"GE": dict(color=SERIES_COLOUR, linestyle="-"), "GP": dict(color=SECOND_COLOUR, linestyle="--")}
     fs.use()
-    fig, axes = plt.subplots(2, 3, figsize=(6.3, 3.9), sharex=True)
+    fig, axes = plt.subplots(2, 3, figsize=fs.size(3.9), sharex=True)
     for i, ds in enumerate(CASE_GEGP):
         for j, (col, label) in enumerate((("nodes", "mean program size (nodes)"), ("diversity", "fitness diversity"),
                                           ("work_avoided", "share of work avoided by hits"))):
@@ -4641,7 +4762,7 @@ def case_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
             if i == 1:
                 ax.set_xlabel("generation")
     axes[0, 0].legend(frameon=False, fontsize=7, loc="upper left")
-    fig.tight_layout()
+    fig.tight_layout(h_pad=1.6)
     p2 = out_tables / "fig_case_gegp.pdf"
     fs.save(fig, p2)
     plt.close(fig)
@@ -4682,6 +4803,8 @@ def mc_numbers(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = results
     pr = props.set_index("dataset")
     pct = lambda x: "--" if pd.isna(x) else f"{100 * x:.0f}"
     out = {"McRowRatio": f"{pr.loc[CASE_MC[1], 'rows'] / pr.loc[CASE_MC[0], 'rows']:.1f}"}
+    for ds, key in MC_NEAR.items():
+        out[f"McNear{key}STFive"] = _num(ann[(ann.dataset == ds) & (ann.fraction.round(2) == 0.05)].S_T.mean(), 2)
     for ds, key in MC_KEY.items():
         p, g = f"Mc{key}", ann[ann.dataset == ds].set_index(ann[ann.dataset == ds].fraction.round(2))
         out[p + "Rows"], out[p + "Classes"] = _rows(pr.loc[ds, "rows"]), str(int(pr.loc[ds, "classes"]))
@@ -4759,7 +4882,19 @@ def mc_claims(metrics: pd.DataFrame, props: pd.DataFrame, store: Path = results.
             ("mc/size-words", f"§6.5: a hit program was nearly as large as a missed one on {a} (> 0.7) and about a third "
              f"of it on {b} (0.25-0.4)", size(ta) > 0.7 and 0.25 <= size(tb) <= 0.4),
             ("mc/weak-baseline", f"§6.5: GE's baseline accuracy on {a} well below gradient boosting (> 0.1 lower)",
-             ge[ge.dataset == a].baseline_accuracy.mean() < pr.loc[a, "difficulty_gb"] - 0.1)] + _mc_limit_claims(ge, pr, c, sec)
+             ge[ge.dataset == a].baseline_accuracy.mean() < pr.loc[a, "difficulty_gb"] - 0.1)] \
+        + _mc_near_claims(st, pr) + _mc_limit_claims(ge, pr, c, sec)
+
+
+def _mc_near_claims(st, pr) -> list[tuple[str, str, bool]]:
+    """§6.5: the binary tables nearest in rows to the multiclass one (one smaller, one larger) were also slower."""
+    a, lo, hi = CASE_MC[0], *MC_NEAR
+    binary = pr[(pr.classes == 2)].rows
+    below, above = binary[binary < pr.loc[a, "rows"]].idxmax(), binary[binary > pr.loc[a, "rows"]].idxmin()
+    return [("mc/near-binary", f"§6.5: {lo} and {hi} are the binary tables nearest in rows below and above {a}",
+             (below, above) == (lo, hi)),
+            ("mc/near-slower", f"§6.5: S_T at 5% lower on {lo} and {hi} than on {a}",
+             st[(lo, 0.05)] < st[(a, 0.05)] and st[(hi, 0.05)] < st[(a, 0.05)])]
 
 
 def _mc_limit_claims(ge, pr, c, sec) -> list[tuple[str, str, bool]]:
@@ -4804,7 +4939,7 @@ def mc_figure(corpus, metrics, props, out_tables, **_) -> list[Path]:
     panels = (("nodes", "program size\n(nodes)"), ("hit_rate", "hit rate\n"),
               ("hit_size", "hit program size /\nmissed program size"), ("work_avoided", "share of work\navoided by hits"))
     fs.use()
-    fig, axes = plt.subplots(1, 4, figsize=(6.3, 2.3), sharex=True)
+    fig, axes = plt.subplots(1, 4, figsize=fs.size(2.3), sharex=True)
     for ax, (col, label) in zip(axes, panels):
         for ds in CASE_MC:
             x = c[c.dataset == ds]
@@ -4823,7 +4958,8 @@ def mc_figure(corpus, metrics, props, out_tables, **_) -> list[Path]:
             ax.set_ylim(0, None)
         ax.set_title(label, fontsize=8, color=INK)
         ax.set_xlabel("generation")
-    axes[1].legend(frameon=False, fontsize=7, loc="lower right")     # the empty bottom of the hit-rate panel
+    axes[0].legend(*axes[1].get_legend_handles_labels(), frameon=False, fontsize=7, loc="upper left",
+                   handlelength=1.5)                                # the empty top left of the size panel
     fig.tight_layout()
     out_tables.mkdir(parents=True, exist_ok=True)
     path = out_tables / "fig_case_mc.pdf"
@@ -4927,7 +5063,8 @@ def hit_work(store: Path = results.STORE) -> pd.DataFrame:
                  miss_work=g.fec_misses * g.fec_miss_operators.fillna(0))
     t = g.groupby(["algorithm", "dataset", "sampler", "fraction"])[["fec_hits", "fec_misses", "hit_work", "miss_work"]].sum()
     out = pd.DataFrame({"hit_size_ratio": (t.hit_work / t.fec_hits) / (t.miss_work / t.fec_misses),
-                        "work_avoided": t.hit_work / (t.hit_work + t.miss_work)}).reset_index()
+                        "work_avoided": t.hit_work / (t.hit_work + t.miss_work),
+                        "hit_rate_diag": t.fec_hits / (t.fec_hits + t.fec_misses)}).reset_index()
     _WORK_CACHE[path] = out
     return out
 
@@ -4978,9 +5115,10 @@ def size_pair_numbers(ann: pd.DataFrame, props: pd.DataFrame, store: Path = resu
             if (a, f, d) not in x.index:
                 return {}
             r, k = x.loc[(a, f, d)], "SizePair" + SIZE_PAIR_KEY[d]
-            out[k + "Rows"], out[k + "Hit"] = _rows(r.rows), f"{r.hit_rate:.2f}"
+            out[k + "Rows"], out[k + "Hit"] = _rows(r.rows), f"{r.hit_rate_diag:.2f}"
             out[k + "Ratio"], out[k + "Work"] = f"{100 * r.hit_size_ratio:.0f}", f"{100 * r.work_avoided:.0f}"
             out[k + "ST"], out[k + "Classes"] = f"{r.S_T:.2f}", str(int(r.classes))
+            out[k + "R"] = f"{r.hit_size_ratio:.2f}"
     sp = similar_pairs(ann, props, store)
     b = sp[(sp.algorithm == "GE") & sp.binary] if len(sp) else sp
     if len(b):
@@ -5011,6 +5149,14 @@ def size_pair_claims(ann: pd.DataFrame, props: pd.DataFrame, store: Path = resul
                     "(within 0.05), larger hit/miss size ratio, more work avoided and higher S_T for the first",
                     max(u.rows, v.rows) / min(u.rows, v.rows) <= 1.5 and abs(u.hit_rate - v.hit_rate) <= 0.05
                     and u.hit_size_ratio > v.hit_size_ratio and u.work_avoided > v.work_avoided and u.S_T > v.S_T))
+        eq7 = lambda r: r.hit_rate_diag * r.hit_size_ratio / (r.hit_rate_diag * r.hit_size_ratio + 1 - r.hit_rate_diag)
+        out.append((f"sizepair/{d1}-{d2}-eq7", f"§6.4, Table 7: {d1} and {d2}: diagnostic hit rates within 0.03, and "
+                    "Equation 7 with the table's h and r gives its w (within 0.005)",
+                    abs(u.hit_rate_diag - v.hit_rate_diag) <= 0.03 and abs(eq7(u) - u.work_avoided) < 0.005
+                    and abs(eq7(v) - v.work_avoided) < 0.005))
+    S, El = x.loc[SIZE_PAIRS[0][:2] + (SIZE_PAIRS[0][2],)], x.loc[SIZE_PAIRS[0][:2] + (SIZE_PAIRS[0][3],)]
+    out.append(("sizepair/words", "§6.4: hit programs almost as large as missed ones on sleep (r > 0.9), about half "
+                "the size on electricity (0.4-0.6)", S.hit_size_ratio > 0.9 and 0.4 <= El.hit_size_ratio <= 0.6))
     (a, f, e, ec), (_a2, _f2, w, bn) = GP_COUNTER
     if all((a, f, d) in x.index for d in (e, ec, w, bn)):
         E, C, W, B = (x.loc[(a, f, d)] for d in (e, ec, w, bn))
@@ -5078,7 +5224,7 @@ def size_pair_figure(corpus, metrics, props, out_tables, **_) -> list[Path]:
     if t.empty:
         return []
     fs.use()
-    fig, axes = plt.subplots(2, 4, figsize=(6.3, 3.9), sharex=True)
+    fig, axes = plt.subplots(2, 4, figsize=fs.size(3.9), sharex=True)
     colours = {}                                               # one colour per dataset across both rows
     for _a, _fr, d1, d2 in SIZE_FIG:
         for d in (d1, d2):
@@ -5107,10 +5253,10 @@ def size_pair_figure(corpus, metrics, props, out_tables, **_) -> list[Path]:
             ax.set_ylim(0, 1)
         axes[r, 1].set_ylim(bottom=0)
         axes[r, 2].set_ylim(bottom=0)
-        axes[r, 0].legend(frameon=False, fontsize=6.5, loc="lower right")
+        axes[r, 0].legend(frameon=False, fontsize=7, loc="upper left", handlelength=1.5)
     from matplotlib.lines import Line2D                         # line styles of the size panels, in one key
     axes[1, 1].legend([Line2D([], [], color=INK, linewidth=1.2), Line2D([], [], color=INK, linewidth=1.2, linestyle="--")],
-                      ["hit programs", "missed programs"], frameon=False, fontsize=6.5, loc="upper left")
+                      ["hit programs", "missed programs"], frameon=False, fontsize=7, loc="upper left")
     for j, title in enumerate(("hit rate", "program size\n(operator calls)", "hit / missed\nprogram size",
                                "share of work\navoided by hits")):
         axes[0, j].set_title(title, fontsize=8, color=INK)
@@ -5174,22 +5320,26 @@ def size_pair_table(corpus, metrics, props, out_tables, min_rows=0, **_) -> list
     if not (_f(results.STORE, "generations.csv")).is_file() or "classes" not in props:
         return []
     x = _work_table(ann, props, results.STORE).set_index(["algorithm", "fraction", "dataset"])
+    cost = cost_design(metrics, props, results.STORE)
+    if cost.empty:
+        return []
+    cost = cost.assign(fraction=cost.fraction.round(2)).set_index(["algorithm", "fraction", "dataset"])
     rows_ = []
     for k, (a, f, d1, d2) in enumerate(SIZE_PAIRS):
         for i, d in enumerate((d1, d2)):
             if (a, f, d) not in x.index:
                 continue
-            r = x.loc[(a, f, d)]
+            r, m = x.loc[(a, f, d)], cost.loc[(a, round(f, 2), d)]
             lead = (("\\addlinespace[3pt]" if k and i == 0 else "") + (f"{a}, {FRACTION_WORD[f]}" if i == 0 else ""))
-            rows_.append(" & ".join([lead, _tt(d), _rows(r.rows), str(int(r.classes)), f"{r.hit_rate:.2f}",
-                                     f"{100 * r.hit_size_ratio:.0f}\\%", f"{100 * r.work_avoided:.0f}\\%",
-                                     f"{r.S_T:.2f}"]))
+            rows_.append(" & ".join([lead, _tt(d), _rows(r.rows), str(int(r.classes)), f"{r.hit_rate_diag:.2f}",
+                                     f"{r.hit_size_ratio:.2f}", f"{r.work_avoided:.2f}", f"{m.fp_cost:.2f}",
+                                     f"{m.S_T_predicted:.2f}", f"{r.S_T:.2f}"]))
     t = _table("tab:size-pairs",
-               "Pairs of tables of similar size and similar hit rate whose cache hits skip programs of different size "
-               "(random fingerprint rows). Hit/miss size: mean size, in operator calls, of a program that hit the "
-               "cache relative to one that missed it; work avoided: share of the full-evaluation work the hits "
-               "avoided (both from the diagnostic runs, generations 1--30 pooled, fingerprint not counted).",
-               "llrrrrrr", "Alg., fraction & Dataset & Rows & Cl. & Hit rate & Hit/miss size & Work avoided & $S_T$",
+               "Two pairs of datasets of similar size and hit rate, random fingerprint rows. $h$: hit rate; $r$: size "
+               "of a hit program relative to a missed one; $w$: work avoided (Equation~\\eqref{eq:work-avoided}); "
+               "$c$: fingerprint cost; predicted $S_T$ from Equation~\\eqref{eq:cost-model}. $h$, $r$ and $w$ come "
+               "from the diagnostic runs, generations 1--30 pooled.",
+               "llrrrrrrrr", "Alg., fraction & Dataset & Rows & Cl. & $h$ & $r$ & $w$ & $c$ & Pred.\\ $S_T$ & $S_T$",
                rows_, "results/store/metrics.csv")
     return [write(out_tables, "size_pairs.tex", t)]
 
@@ -5533,7 +5683,7 @@ def fraction_tradeoff_figure(corpus, metrics, props, out_tables, min_rows=0, **_
     fractions = sorted(a.fraction.unique())
     labels = [FRACTION_WORD[round(float(f), 2)].replace("\\%", "%") for f in fractions]
     fs.use()
-    fig, axes = plt.subplots(2, 4, figsize=(6.3, 3.9))
+    fig, axes = plt.subplots(2, 4, figsize=fs.size(3.9))
     for r, algo in enumerate(("GE", "GP")):
         g = a[a.algorithm == algo]
         for c, (col, label, scale, ref) in enumerate(TRADEOFF_MEASURES):
@@ -5722,7 +5872,7 @@ def pair_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
     paths = []
     for pair, stem in zip(PAIRS, ("fig_pair_codrna_covertype", "fig_pair_diabetes_run")):
         fs.use()
-        fig, axes = plt.subplots(2, 3, figsize=(6.3, 4.0), sharex=True)
+        fig, axes = plt.subplots(2, 3, figsize=fs.size(4.0), sharex=True)
         for ax, (col, label, phen) in zip(axes.flat, PAIR_MEASURES):
             for i, ds in enumerate(pair):
                 mark = {}                                  # one colour per dataset, line style per fraction
@@ -5746,7 +5896,7 @@ def pair_figures(corpus, metrics, props, out_tables, **_) -> list[Path]:
             ax.set_xlabel("generation")
         handles, labels = axes[0, 2].get_legend_handles_labels()
         axes[1, 2].axis("off")                           # the sixth slot holds the legend
-        axes[1, 2].legend(handles, labels, loc="center", frameon=False, fontsize=6.5)
+        axes[1, 2].legend(handles, labels, loc="center", frameon=False, fontsize=7)
         axes[0, 2].tick_params(labelbottom=True)
         axes[0, 2].set_xlabel("generation")
         fig.tight_layout()
@@ -5770,6 +5920,23 @@ BUILDERS: list = [diagram_figures, corpus_tables, outcome_map_tables, summary_ta
                    supplementary]
 
 
+def supplementary_figures(corpus, metrics, props, out_tables, out_supp, **_) -> list[Path]:
+    """Figures S2-S4 and the cost-model figure, as the supplementary builder writes them (for --figures)."""
+    metrics = metrics[metrics.sampler == MAIN_SAMPLER]
+    in_text = metrics[metrics.dataset.isin(list(ordered_corpus(corpus, props).dataset))]
+    out = [fake_acc_by_fraction_figure(in_text, out_supp), fake_acc_paired_figure(in_text, out_supp)]
+    if (_f(results.STORE, "runs.csv")).is_file() and (_f(results.STORE, "generations.csv")).is_file():
+        out.append(size_fingerprint_figure(size_design(in_text, props), out_supp))
+    if (_f(results.STORE, "phase_timing.csv")).is_file() and (_f(results.STORE, "generations.csv")).is_file():
+        out.append(cost_figure(cost_design(in_text, props), out_tables))
+    return out
+
+
+# Every builder that draws a figure; `python paper_tables.py --figures --out DIR` runs only these.
+FIGURE_BUILDERS: list = [diagram_figures, size_figure, case_figures, mc_figure, fraction_tradeoff_figure, pair_figures,
+                         ge_vs_gp_figure, size_pair_figure, hit_kinds_figure, dynamics_figures, supplementary_figures]
+
+
 STORE_INPUTS = ("metrics.csv", "datasets.csv", "runs.csv", "generations.csv", "phase_timing.csv",
                 "instrumented_runs.csv", "instrumented_generations.csv")
 
@@ -5784,6 +5951,8 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out", type=Path, default=None, help="output folder (default: paper/)")
     ap.add_argument("--check", action="store_true", help="rebuild in a temporary folder and compare with the output folder")
     ap.add_argument("--min-rows", type=int, default=0, help="main-text results tables: leave out smaller datasets")
+    ap.add_argument("--figures", action="store_true",
+                    help="draw only the figures (main text and supplementary); use with --out to look at them first")
     a = ap.parse_args(argv)
     tables_dir, supp_dir = (a.out / "tables", a.out / "supplementary") if a.out else (TABLES, SUPPLEMENTARY)
     missing = missing_inputs()
@@ -5792,7 +5961,7 @@ def main(argv: list[str] | None = None) -> int:
               + ", ".join(f"{n}(.gz)" for n in missing) + "\n"
               "generations.csv.gz is attached to the release; download it with\n"
               "  curl -L -o results/store/generations.csv.gz "
-              "https://github.com/aghilhooshmand/FEC-GE-GP/releases/download/v1.1.0/generations.csv.gz",
+              "https://github.com/aghilhooshmand/FEC-GE-GP/releases/download/v1.2.0/generations.csv.gz",
               file=sys.stderr)
         return 1
     try:
@@ -5806,7 +5975,7 @@ def main(argv: list[str] | None = None) -> int:
                     print(f"differs: {p.name}")
                 print(f"check: {len(written) - len(differ)} of {len(written)} files identical")
                 return 1 if differ else 0
-        written = build(tables_dir, supp_dir, a.min_rows)
+        written = build(tables_dir, supp_dir, a.min_rows, builders=FIGURE_BUILDERS if a.figures else None)
     except TableError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

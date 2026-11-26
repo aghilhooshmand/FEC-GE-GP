@@ -290,24 +290,24 @@ Only generations with at least one fake hit are counted. The diagnostic runs rec
 | `rows` | Number of rows of the dataset as used. |
 | `fraction` | Fingerprint fraction: share of the training rows used as fingerprint rows (0.01, 0.05, 0.10); random fingerprint rows. |
 | `dAcc_pp` | Accuracy difference as in `dAcc`, in percentage points (pp). |
-| `p_worse_rho0.0` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.0 between the runs. |
-| `p_rope_rho0.0` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.0. |
-| `verdict_rho0.0` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.0. |
-| `p_worse_rho0.1` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.1 between the runs. |
-| `p_rope_rho0.1` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.1. |
-| `verdict_rho0.1` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.1. |
-| `p_worse_rho0.2` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.2 between the runs. |
-| `p_rope_rho0.2` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.2. |
-| `verdict_rho0.2` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.2 (as Table 5). |
-| `p_worse_rho0.3` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.3 between the runs. |
-| `p_rope_rho0.3` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.3. |
-| `verdict_rho0.3` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.3. |
-| `p_worse_rho0.4` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.4 between the runs. |
-| `p_rope_rho0.4` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.4. |
-| `verdict_rho0.4` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.4. |
-| `p_worse_rho0.5` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.5 between the runs. |
-| `p_rope_rho0.5` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.5. |
-| `verdict_rho0.5` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.5. |
+| `p_worse_kappa0.0` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.0 between the runs. |
+| `p_rope_kappa0.0` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.0. |
+| `verdict_kappa0.0` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.0. |
+| `p_worse_kappa0.1` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.1 between the runs. |
+| `p_rope_kappa0.1` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.1. |
+| `verdict_kappa0.1` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.1. |
+| `p_worse_kappa0.2` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.2 between the runs. |
+| `p_rope_kappa0.2` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.2. |
+| `verdict_kappa0.2` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.2 (as Table 5). |
+| `p_worse_kappa0.3` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.3 between the runs. |
+| `p_rope_kappa0.3` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.3. |
+| `verdict_kappa0.3` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.3. |
+| `p_worse_kappa0.4` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.4 between the runs. |
+| `p_rope_kappa0.4` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.4. |
+| `verdict_kappa0.4` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.4. |
+| `p_worse_kappa0.5` | P(FEC accuracy lower by more than 1 pp), Bayesian correlated t-test with an assumed correlation of 0.5 between the runs. |
+| `p_rope_kappa0.5` | P(FEC and baseline accuracy within ±1 pp), same test with correlation 0.5. |
+| `verdict_kappa0.5` | Bayesian accuracy verdict (threshold 0.95) with correlation 0.5. |
 
 ## Table S16: Dataset size and fingerprint size modelled together (`TableS16_size_vs_fingerprint.csv`)
 

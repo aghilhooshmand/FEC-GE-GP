@@ -194,9 +194,9 @@ def test_supplementary_valid_index_writes_list(tmp_path):
     text = (tmp_path / "t" / "supplementary.tex").read_text()
     assert "Figure S1: A figure; Figure S2: Fake hits" in text and "Figure S3: Accuracy difference" in text
     assert "Figure S3: Accuracy difference at the fractions with the most and fewest fake hits; Figure S4: Fake hits" in text
-    assert "against the number of fingerprint rows; Figure S5: Predicted against measured speedup; Table S1: Metrics" in text
+    assert "against the number of fingerprint rows; Table S1: Metrics" in text
     _, rows = pt.read_index(folder / "INDEX.md")
-    assert [r["id"] for r in rows] == ["Figure S1", "Figure S2", "Figure S3", "Figure S4", "Figure S5"] + [f"Table S{i}" for i in range(1, 21)] + ["File S1"]
+    assert [r["id"] for r in rows] == ["Figure S1", "Figure S2", "Figure S3", "Figure S4"] + [f"Table S{i}" for i in range(1, 21)] + ["File S1"]
     assert all(r["size"] and r["committed"] == "yes" for r in rows)
 
 
